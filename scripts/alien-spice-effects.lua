@@ -1,4 +1,10 @@
 local spice_evolution_factor = settings.global['spice-evolution-factor'].value
+local enum_next_level = {
+	small = 'medium',
+	medium = 'big',
+	big = 'behemoth',
+	behemoth = 'behemoth'
+}
 
 function update_vars(event)
 	local setting = event.setting
@@ -16,7 +22,7 @@ function destroyed_entity(event)
 				local force = cause.force
 				local evolution_factor = force.evolution_factor
 				force.evolution_factor = evolution_factor * spice_evolution_factor
-				apply_spice_to_alien(evolve_biter(cause))
+				apply_spice_to_alien(evolve_biter(cause, 2))
 			end
 		end
 	end
@@ -51,9 +57,9 @@ function has_spice_in_inventory(entity)
 	return false
 end
 
-function evolve_biter(cause)
-	local next_level = get_next_level(cause.name)
-	if (next_level) then
+function evolve_biter(cause, steps)
+	local next_level = get_next_level(cause.name, steps)
+	if next_level ~= cause.name then
 		local surface = cause.surface
 		local position = cause.position
 		cause.destroy()
@@ -62,16 +68,19 @@ function evolve_biter(cause)
 	return cause
 end
 
-function get_next_level(name)
-	if name == 'small-biter' then
-		return 'medium-biter'
-	elseif name == 'medium-biter' then
-		return 'big-biter'
-	elseif name == 'big-biter' then
-		return 'behemoth-biter'
-	else
-		return nil
+function get_next_level(name, steps)
+	if steps > 0 then
+		for _, type in pairs({'biter', 'spitter', 'worm-turret'}) do
+			if string.matches(name, type) then
+				for _, size in pairs({'small', 'medium', 'big', 'behemoth'}) do
+					if string.matches(name, size) then
+						return get_next_level(enum_next_level[size] .. '-' .. type, steps -1)
+					end
+				end
+			end
+		end
 	end
+	return name
 end
 
 function apply_spice_to_alien(cause)

@@ -199,7 +199,7 @@ data:extend({
 						width = 385,
 						height = 355,
 						frame_count = 1,
-						shift = util.by_pixel(10.5, 6),
+						shift = util.by_pixel(5.5, 3),
 						scale = 0.5
 					}
 				},
@@ -208,14 +208,14 @@ data:extend({
 					priority = 'high',
 					width = 210,
 					height = 176,
-					shift = util.by_pixel(5, 6),
+					shift = util.by_pixel(0, 6),
 					draw_as_shadow = true,
 					hr_version = {
 						filename = '__nauvis-melange__/graphics/entity/drying-rig/hr-drying-rig-shadow.png',
 						priority = 'high',
 						width = 420,
 						height = 352,
-						shift = util.by_pixel(5, 6),
+						shift = util.by_pixel(0, 6),
 						draw_as_shadow = true,
 						scale = 0.5
 					}
