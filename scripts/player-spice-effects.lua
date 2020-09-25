@@ -9,6 +9,17 @@ function used_capsule(event)
 	end
 end
 
+function has_spice(entity)
+	if (entity.stickers) then
+		for _, sticker in pairs(entity.stickers) do
+			if string.match(sticker.name, 'spice') then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function apply_spice_to_vehicle(player_index)
 	local player = game.get_player(player_index)
 	if (player.character) then
@@ -16,22 +27,11 @@ function apply_spice_to_vehicle(player_index)
 		if (character.vehicle) then
 			local vehicle = character.vehicle
 			-- might add black list for certain vehicles
-			if (character.stickers) then
-				for _, sticker in pairs(character.stickers) do
-					if string.match(sticker.name, 'spice') then
-						if (vehicle.stickers) then
-							for _, conflict in pairs(vehicle.stickers) do
-								if string.match(conflict.name, 'spice') then
-									return
-								end
-							end
-						end
-						local surface = vehicle.surface
-						local position = vehicle.position
-						surface.create_entity({ name = 'spice-speed-sticker', target = vehicle, position = position })
-						surface.create_entity({ name = 'spice-vehicle-regen-sticker', target = vehicle, position = position })
-					end
-				end
+			if not has_spice(vehicle) and has_spice(character) then
+				local surface = vehicle.surface
+				local position = vehicle.position
+				surface.create_entity({ name = 'spice-speed-sticker', target = vehicle, position = position })
+				surface.create_entity({ name = 'spice-vehicle-regen-sticker', target = vehicle, position = position })
 			end
 		end
 	end
