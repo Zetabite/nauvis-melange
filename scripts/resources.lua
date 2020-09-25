@@ -1,6 +1,6 @@
 function destroyed_entity(event)
 	local entity = event.entity
-	if(entity) then
+	if (entity) then
 		if entity.type == 'turret' and string.match(entity.name, 'worm') then
 			create_worm_hole(entity)
 		end
@@ -10,8 +10,8 @@ end
 function create_worm_hole(entity)
 	local surface = entity.surface
 	local pos = entity.position
-	local blocking = surface.find_entities_filtered({ name = 'worm-hole', position = pos, radius = 1 })
-	if #blocking == 0 then
+	pos = surface.find_non_colliding_position({ name = 'worm-hole', position = pos, radius = 2, force_to_tile_center = true, precision = 0.5 })
+	if (pos) then
 		surface.create_entity({ name = 'worm-hole', position = pos })
 	end
 end

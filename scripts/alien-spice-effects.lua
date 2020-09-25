@@ -4,42 +4,18 @@ local spice_evolve_neighbours = settings.global['spice-evolve-neighbours'].value
 local spice_evolve_neighbours_radius = settings.global['spice-evolve-neighbours-radius'].value
 
 local enum_next_level = {
-	['small-spitter'] = {
-		[1] = 'medium-spitter', [2] = 'big-spitter', [3] = 'behemoth-spitter'
-	},
-	['medium-spitter'] = {
-		[1] = 'big-spitter', [2] = 'behemoth-spitter', [3] = 'behemoth-spitter'
-	},
-	['big-spitter'] = {
-		[1] = 'big-spitter', [2] = 'behemoth-spitter', [3] = 'behemoth-spitter'
-	},
-	['behemoth-spitter'] = {
-		[1] = 'big-spitter', [2] = 'behemoth-spitter', [3] = 'behemoth-spitter'
-	},
-	['small-biter'] = {
-		[1] = 'medium-biter', [2] = 'big-biter', [3] = 'behemoth-biter'
-	},
-	['medium-biter'] = {
-		[1] = 'big-biter', [2] = 'behemoth-biter', [3] = 'behemoth-biter'
-	},
-	['big-biter'] = {
-		[1] = 'big-biter', [2] = 'behemoth-biter', [3] = 'behemoth-biter'
-	},
-	['behemoth-biter'] = {
-		[1] = 'big-biter', [2] = 'behemoth-biter', [3] = 'behemoth-biter'
-	},
-	['small-worm-turret'] = {
-		[1] = 'medium-worm-turret', [2] = 'big-worm-turret', [3] = 'behemoth-worm-turret'
-	},
-	['medium-worm-turret'] = {
-		[1] = 'big-worm-turret', [2] = 'behemoth-worm-turret', [3] = 'behemoth-worm-turret'
-	},
-	['big-worm-turret'] = {
-		[1] = 'big-worm-turret', [2] = 'behemoth-worm-turret', [3] = 'behemoth-worm-turret'
-	},
-	['behemoth-worm-turret'] = {
-		[1] = 'big-worm-turret', [2] = 'behemoth-worm-turret', [3] = 'behemoth-worm-turret'
-	}
+	['small-spitter'] = {[1] = 'medium-spitter', [2] = 'big-spitter', [3] = 'behemoth-spitter'},
+	['medium-spitter'] = {[1] = 'big-spitter', [2] = 'behemoth-spitter'},
+	['big-spitter'] = {[1] = 'behemoth-spitter'},
+	['behemoth-spitter'] = {},
+	['small-biter'] = {[1] = 'medium-biter', [2] = 'big-biter', [3] = 'behemoth-biter'},
+	['medium-biter'] = {[1] = 'big-biter', [2] = 'behemoth-biter'},
+	['big-biter'] = {[1] = 'behemoth-biter'},
+	['behemoth-biter'] = {},
+	['small-worm-turret'] = {[1] = 'medium-worm-turret', [2] = 'big-worm-turret', [3] = 'behemoth-worm-turret'},
+	['medium-worm-turret'] = {[1] = 'big-worm-turret', [2] = 'behemoth-worm-turret'},
+	['big-worm-turret'] = {[1] = 'behemoth-worm-turret'},
+	['behemoth-worm-turret'] = {}
 }
 
 local enum_aliens = {
@@ -68,8 +44,7 @@ function destroyed_entity(event)
 			local entity = event.entity
 			if has_spice_in_fluidbox(entity) or has_spice_in_inventory(entity) then
 				local force = cause.force
-				local evolution_factor = force.evolution_factor
-				force.evolution_factor = evolution_factor * spice_evolution_factor
+				force.evolution_factor = force.evolution_factor * spice_evolution_factor
 				cause = apply_spice_to_alien(evolve_alien(cause, spice_direct_evolution_level))
 				if spice_evolve_neighbours then
 					local surface = cause.surface
@@ -127,16 +102,15 @@ function evolve_alien(alien, steps)
 end
 
 function get_next_level(name, steps)
-	if steps > 0 then
-		return enum_next_level[name][steps]
-	elseif steps > 3 then
-		return enum_next_level[name][3]
+	local next_level = enum_next_level[name]
+	if (next_level[steps]) then
+		return next_level[steps]
 	else
 		return name
 	end
 end
 
--- only allows melee units to collect
+-- only allows melee units to collect spice
 function apply_spice_to_alien(alien)
 	local surface = alien.surface
 	local position = alien.position
