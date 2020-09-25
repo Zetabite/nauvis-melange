@@ -1,0 +1,10 @@
+{
+    "Lua.diagnostics.globals": [
+        "data",
+        "defines",
+        "game",
+        "pipecoverspictures",
+        "util",
+        "settings"
+    ]
+}
