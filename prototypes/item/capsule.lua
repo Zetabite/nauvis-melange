@@ -39,7 +39,7 @@ data:extend({
 										sticker = 'spice-regen-sticker'
 									},
 									{
-										type = "play-sound",
+										type = 'play-sound',
 										sound = {
 											{
 												filename = '__base__/sound/heartbeat.ogg',

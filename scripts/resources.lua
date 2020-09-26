@@ -10,7 +10,7 @@ end
 function create_worm_hole(entity)
 	local surface = entity.surface
 	local pos = entity.position
-	pos = surface.find_non_colliding_position({ name = 'worm-hole', position = pos, radius = 2, force_to_tile_center = true, precision = 0.5 })
+	pos = surface.find_non_colliding_position('worm-hole', pos, 2, 0.5, true)
 	if (pos) then
 		surface.create_entity({ name = 'worm-hole', position = pos })
 	end

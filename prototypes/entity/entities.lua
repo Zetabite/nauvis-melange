@@ -1,5 +1,5 @@
-local hit_effects = require ('__base__/prototypes/entity/demo-hit-effects')
-local sounds = require('__base__/prototypes/entity/demo-sounds')
+local hit_effects = require ('__base__.prototypes.entity.demo-hit-effects')
+local sounds = require('__base__.prototypes.entity.demo-sounds')
 local blank = {
 	filename = '__nauvis-melange__/graphics/entity/water-injector/blank.png',
 	priority = 'very-low',

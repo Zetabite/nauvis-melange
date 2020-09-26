@@ -42,7 +42,9 @@ function destroyed_entity(event)
 		local cause = event.cause
 		if spice_elligible_alien(cause) then
 			local entity = event.entity
-			if has_spice_in_fluidbox(entity) or has_spice_in_inventory(entity) then
+			-- in case we later want to scale effect based on this
+			local spice_amount = has_spice_in_fluidbox(entity) or has_spice_in_inventory(entity)
+			if spice_amount then
 				local force = cause.force
 				force.evolution_factor = force.evolution_factor * spice_evolution_factor
 				cause = apply_spice_to_alien(evolve_alien(cause, spice_direct_evolution_level))
@@ -66,7 +68,7 @@ function has_spice_in_fluidbox(entity)
 		local fluidbox = entity.fluidbox
 		for i = 1, #fluidbox, 1 do
 			if fluidbox.get_locked_fluid(i) == 'spice-gas' then
-				return true
+				return fluidbox.get_capacity(i)
 			end
 		end
 	end
@@ -85,9 +87,10 @@ function has_spice_in_inventory(entity)
 		return false
 	end
 	if inventory.find_item_stack('spice') then
-		return true
+		return inventory.find_item_stack('spice').count
+	else
+		return false
 	end
-	return false
 end
 
 function evolve_alien(alien, steps)
