@@ -4,11 +4,15 @@ data:extend({
 		name = 'spice-processing',
 		icon_size = 64,
 		icon = '__nauvis-melange__/graphics/technology/spice-processing.png',
-		prerequisites = {'solar-energy', 'oil-processing'},
+		prerequisites = {'solar-energy', 'oil-processing', 'advanced-electronics'},
 		effects = {
 			{
 				type = 'unlock-recipe',
 				recipe = 'drying-rig'
+			},
+			{
+				type = 'unlock-recipe',
+				recipe = 'solar-component-foil'
 			},
 			{
 				type = 'unlock-recipe',
@@ -25,7 +29,10 @@ data:extend({
 		},
 		unit = {
 			count = 250,
-			ingredients = {{'automation-science-pack', 1}, {'logistic-science-pack', 1}},
+			ingredients = {
+				{'automation-science-pack', 1},
+				{'logistic-science-pack', 1}
+			},
 			time = 30
 		},
 	},

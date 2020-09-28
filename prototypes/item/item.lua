@@ -7,10 +7,30 @@ data:extend({
 		icon = '__nauvis-melange__/graphics/icons/water-injector.png',
 		icon_size = 64, icon_mipmaps = 4,
 		subgroup = 'extraction-machine',
-		order = 'a[water-injector]',
+		order = 'b[water-injector]',
 		place_result = 'water-injector-proxy',
 		stack_size = 50
 	},
+	{
+		type = 'item',
+		name = 'solar-component-foil',
+		icon = '__nauvis-melange__/graphics/icons/solar-component-foil.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'intermediate-product',
+		order = 'd[solar-component-foil]',
+		stack_size = 200
+	},
+	--[[
+	{
+		type = 'item',
+		name = 'solar-drying-panel',
+		icon = '__nauvis-melange__/graphics/icons/solar-drying-panel.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'intermediate-product',
+		order = 'a[solar-drying-panel]',
+		stack_size = 20
+	},
+	--]]
 	{
 		type = 'item',
 		name = 'drying-rig',

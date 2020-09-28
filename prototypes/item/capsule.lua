@@ -55,7 +55,7 @@ data:extend({
 			}
 		},
 		subgroup = 'intermediate-product',
-		order = 'b[spice]',
+		order = 'd[spice]',
 		stack_size = 50
 	},
 })

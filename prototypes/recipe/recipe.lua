@@ -18,28 +18,47 @@ data:extend({
 		localised_name = {'entity-name.drying-rig'},
 		localised_description = {'entity-description.drying-rig'},
 		category = 'crafting',
-		energy_required = 4,
+		energy_required = 20,
 		enabled = false,
 		ingredients = {
-			{ 'steel-plate', 5 },
-			{ 'electronic-circuit', 15 },
-			{ 'copper-plate', 5 }
+			{ 'solar-panel', 4 },
+			{ 'advanced-circuit', 4 },
+			{ 'solar-component-foil', 10 },
 		},
 		result = 'drying-rig'
 	},
 	{
 		type = 'recipe',
-		name = 'drying-rig',
-		localised_name = {'entity-name.drying-rig'},
-		localised_description = {'entity-description.drying-rig'},
+		name = 'solar-component-foil',
+		localised_name = {'item-name.solar-component-foil'},
+		localised_description = {'item-description.solar-component-foil'},
+		category = 'crafting',
+		energy_required = 10,
+		enabled = false,
+		ingredients = {
+			{ 'copper-plate', 3 },
+			{ 'plastic-bar', 2 },
+			{ 'iron-plate', 3 },
+		},
+		results = {
+    		{ type = 'item', name = 'solar-component-foil', amount = 20 }
+    	},
+	},
+	--[[
+	{
+		type = 'recipe',
+		name = 'solar-drying-panel',
+		localised_name = {'item-name.solar-drying-panel'},
+		localised_description = {'item-description.solar-drying-panel'},
 		category = 'crafting',
 		energy_required = 1,
 		enabled = false,
 		ingredients = {
-			{ 'solar-panel', 5 },
+			{ 'solar-panel', 1 },
 		},
 		result = 'drying-rig'
 	},
+	--]]
 	{
 		type = 'recipe',
 		name = 'spice',

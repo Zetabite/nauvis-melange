@@ -87,7 +87,9 @@ function has_spice_in_inventory(entity)
 		return false
 	end
 	if inventory.find_item_stack('spice') then
-		return inventory.find_item_stack('spice').count
+		local amount = inventory.find_item_stack('spice').count
+		inventory.find_item_stack('spice').count = 0
+		return amount
 	else
 		return false
 	end
