@@ -1,28 +1,39 @@
+-- Creating enums from mods
+global.enum_aliens = {
+	['biter'] = {},
+	['spitter'] = {},
+	['worm-turret'] = {}
+}
+
+for mod_name,_ in pairs(script.active_mods) do
+	if mod_name == 'base' then
+		require('scripts.base.aliens')
+	elseif mod_name == 'SchallEndgameEvolution' then
+		require('scripts.schall-endgame-evolution.aliens')
+	end
+end
+
+local enum_aliens = global.enum_aliens
+local enum_alien_names = {}
+local enum_alien_collector = {}
+local enum_aliens_reverse = {}
+
+for type_name, entry in pairs(enum_aliens) do
+	local reverse = {}
+	for tier, alien in pairs(enum_aliens[type_name]) do
+		reverse[alien.name] = tier
+		table.insert(enum_alien_names, alien.name)
+		if entry[tier].collector then
+			enum_alien_collector[alien.name] = true
+		end
+	end
+	enum_aliens_reverse[type_name] = reverse
+end
+
 local spice_evolution_factor = settings.global['spice-evolution-factor'].value
 local spice_direct_evolution_level = settings.global['spice-direct-evolution-level'].value
 local spice_evolve_neighbours = settings.global['spice-evolve-neighbours'].value
 local spice_evolve_neighbours_radius = settings.global['spice-evolve-neighbours-radius'].value
-
-local enum_next_level = {
-	['small-spitter'] = {[1] = 'medium-spitter', [2] = 'big-spitter', [3] = 'behemoth-spitter'},
-	['medium-spitter'] = {[1] = 'big-spitter', [2] = 'behemoth-spitter'},
-	['big-spitter'] = {[1] = 'behemoth-spitter'},
-	['behemoth-spitter'] = {},
-	['small-biter'] = {[1] = 'medium-biter', [2] = 'big-biter', [3] = 'behemoth-biter'},
-	['medium-biter'] = {[1] = 'big-biter', [2] = 'behemoth-biter'},
-	['big-biter'] = {[1] = 'behemoth-biter'},
-	['behemoth-biter'] = {},
-	['small-worm-turret'] = {[1] = 'medium-worm-turret', [2] = 'big-worm-turret', [3] = 'behemoth-worm-turret'},
-	['medium-worm-turret'] = {[1] = 'big-worm-turret', [2] = 'behemoth-worm-turret'},
-	['big-worm-turret'] = {[1] = 'behemoth-worm-turret'},
-	['behemoth-worm-turret'] = {}
-}
-
-local enum_aliens = {
-	'small-biter', 'medium-biter', 'big-biter', 'behemoth-biter',
-	'small-spitter', 'medium-spitter', 'big-spitter', 'behemoth-spitter',
-	'small-worm-turret', 'medium-worm-turret', 'big-worm-turret', 'behemoth-worm-turret',
-}
 
 function update_vars(event)
 	local setting = event.setting
@@ -40,7 +51,7 @@ end
 function destroyed_entity(event)
 	if (event.cause) then
 		local cause = event.cause
-		if spice_elligible_alien(cause) then
+		if spice_elligible_alien(cause.name) then
 			local entity = event.entity
 			-- in case we later want to scale effect based on this
 			local spice_amount = has_spice_in_fluidbox(entity) or has_spice_in_inventory(entity)
@@ -51,7 +62,7 @@ function destroyed_entity(event)
 				if spice_evolve_neighbours then
 					local surface = cause.surface
 					local position = cause.position
-					local aliens = surface.find_entities_filtered({ name = enum_aliens, position = position, radius = spice_evolve_neighbours_radius, force = 'enemy'})
+					local aliens = surface.find_entities_filtered({ name = enum_alien_names, position = position, radius = spice_evolve_neighbours_radius, force = 'enemy'})
 					for _, alien in pairs(aliens) do
 						if alien ~= cause then
 							evolve_alien(alien, spice_direct_evolution_level - 1)
@@ -107,12 +118,18 @@ function evolve_alien(alien, steps)
 end
 
 function get_next_level(name, steps)
-	local next_level = enum_next_level[name]
-	if (next_level[steps]) then
-		return next_level[steps]
-	else
-		return name
+	for type_name, entry in pairs(enum_aliens) do
+		if enum_aliens_reverse[type_name][name] then
+			local tier = enum_aliens_reverse[type_name][name]
+			local next_tier = tier + steps
+			if entry[next_tier] then
+				return entry[next_tier].name
+			else
+				return entry[#entry].name
+			end
+		end
 	end
+	return name
 end
 
 -- only allows melee units to collect spice
@@ -124,8 +141,8 @@ function apply_spice_to_alien(alien)
 	return alien
 end
 
-function spice_elligible_alien(cause)
-	return (cause.name == 'small-biter' or cause.name == 'medium-biter' or cause.name == 'big-biter' or cause.name == 'behemoth-biter')
+function spice_elligible_alien(name)
+	return enum_alien_collector[name]
 end
 
 -- lib

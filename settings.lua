@@ -12,7 +12,8 @@ data:extend({
 		name = 'spice-direct-evolution-level',
 		setting_type = 'runtime-global',
 		minimum_value = 0,
-		maximum_value = 4,
+		--4 for normal max, 20 in case of Schall Evolution
+		maximum_value = 20,
 		default_value = 2
 	},
 	{
