@@ -5,6 +5,15 @@
         "game",
         "pipecoverspictures",
         "util",
-        "settings"
+        "settings",
+        "crash_trigger",
+        "worm_start_attack_animation",
+        "global",
+        "script",
+        "rendering",
+        "worm_shoot_shiftings"
+    ],
+    "Lua.diagnostics.disable": [
+        "lowercase-global"
     ]
 }

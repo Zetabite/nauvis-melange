@@ -58,4 +58,34 @@ data:extend({
 		order = 'd[spice]',
 		stack_size = 50
 	},
+	{
+		type = 'capsule',
+		name = 'alien-probe',
+		icon = '__nauvis-melange__/graphics/icons/sample.png',
+		icon_size = 64, icon_mipmaps = 4,
+		capsule_action = {
+			type = 'throw',
+			attack_parameters = {
+				type = 'projectile',
+				ammo_category = 'capsule',
+				cooldown = 20,
+				range = 5,
+				ammo_type = {
+					category = 'capsule',
+					target_type = 'position',
+					action = {
+						type = 'direct',
+						action_delivery = {
+							type = 'projectile',
+							projectile = 'alien-probe-projectile',
+							starting_speed = 0.5
+						}
+					}
+				}
+			}
+		},
+		subgroup = 'capsule',
+		order = 'd[alien-probe]',
+		stack_size = 50
+	}
 })

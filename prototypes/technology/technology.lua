@@ -36,4 +36,62 @@ data:extend({
 			time = 30
 		},
 	},
+	{
+		type = 'technology',
+		name = 'alien-breeding',
+		icon_size = 64,
+		icon = '__nauvis-melange__/graphics/technology/spice-processing.png',
+		prerequisites = {'spice-processing'},
+		effects = {
+			{
+				type = 'unlock-recipe',
+				recipe = 'alien-growth-chamber'
+			},
+			{
+				type = 'unlock-recipe',
+				recipe = 'alien-probe'
+			},
+			{
+				type = 'unlock-recipe',
+				recipe = 'biter-leech'
+			},
+			{
+				type = 'unlock-recipe',
+				recipe = 'sandtrout'
+			},
+			{
+				type = 'unlock-recipe',
+				recipe = 'travel-worm'
+			},
+		},
+		unit = {
+			count = 250,
+			ingredients = {
+				{'automation-science-pack', 1},
+				{'logistic-science-pack', 1}
+			},
+			time = 30
+		},
+	},
+	{
+		type = 'technology',
+		name = 'spacing-guild',
+		icon_size = 64,
+		icon = '__nauvis-melange__/graphics/technology/spice-processing.png',
+		prerequisites = {'spice-processing', 'alien-breeding'},
+		effects = {
+			{
+				type = 'unlock-recipe',
+				recipe = 'biter-navigator'
+			},
+		},
+		unit = {
+			count = 250,
+			ingredients = {
+				{'automation-science-pack', 1},
+				{'logistic-science-pack', 1}
+			},
+			time = 30
+		},
+	},
 })

@@ -1,12 +1,12 @@
 {
     "name": "nauvis-melange",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "title": "Nauvis Melange",
     "author": "Zetabite",
     "factorio_version": "0.18",
     "dependencies": [
 		"base >= 0.18",
-		"SchallEndgameEvolution >= 1.0.0"
+		"(?) SchallEndgameEvolution >= 1.0.0"
     ],
     "description": "EN: 'The Spice extends life, the Spice expands consciousness, the Spice is vital to space travel.' ~ Princess Irulan\nThis mod aims to implement a substance, The spice, also called Melange, onto the planet of Nauvis. It features a production line for this precious substance. But be aware, as it may extend your life and expand consciousness, it may also does for the natives of this planet, the aliens!\n\nDE: 'Das Spice garantiert das Leben, das Spice erweitert das Bewusstsein, das Spice ist lebenswichtig für die Raumfahrt.' ~ Prinzessin Irulan\nDiese Mod bringt die Spice Melange, auf den Planeten Nauvis. Sie bietet eine Produktions-Linie für diese wertvolle Substanz. Aber aufgepasst, nicht nur dein Leben wird durch sie garantiert und dein Bewusstsein erweitert. Das selbe mag auch auf die Ureinwohner des Planeten zutreffen, den Aliens!"
 }

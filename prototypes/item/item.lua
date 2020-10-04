@@ -33,6 +33,38 @@ data:extend({
 	--]]
 	{
 		type = 'item',
+		name = 'biter-navigator',
+		icon = '__nauvis-melange__/graphics/icons/drying-rig.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'intermediate-product',
+		stack_size = 50
+	},
+	{
+		type = 'item',
+		name = 'alien-growth-chamber',
+		localised_name = {'entity-name.alien-growth-chamber'},
+		localised_description = {'entity-description.alien-growth-chamber'},
+		icon = '__nauvis-melange__/graphics/icons/alien-growth-chamber.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'production-machine',
+		place_result = 'alien-growth-chamber',
+		stack_size = 50
+	},
+	--[[
+	{
+		type = 'item',
+		name = 'thumper',
+		localised_name = {'entity-name.thumper'},
+		localised_description = {'entity-description.thumper'},
+		icon = '__nauvis-melange__/graphics/icons/drying-rig.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'intermediate-product',
+		place_result = 'thumper',
+		stack_size = 50
+	},
+	--]]
+	{
+		type = 'item',
 		name = 'drying-rig',
 		localised_name = {'entity-name.drying-rig'},
 		localised_description = {'entity-description.drying-rig'},
@@ -52,4 +84,90 @@ data:extend({
 		order = 'b[pre-spice-mass]',
 		stack_size = 100
 	},
+	{
+		type = 'item',
+		name = 'sandtrout',
+		icons =  {
+			{
+				icon = '__nauvis-melange__/graphics/icons/leech.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+			{
+				icon = '__nauvis-melange__/graphics/icons/worm-overlay.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+		},
+		subgroup = 'raw-resource',
+		order = 'b[sandtrout]',
+		place_result = 'worm-hole',
+		stack_size = 100
+	},
+	{
+		type = 'item',
+		name = 'biter-leech',
+		icons =  {
+			{
+				icon = '__nauvis-melange__/graphics/icons/leech.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+			{
+				icon = '__nauvis-melange__/graphics/icons/biter-overlay.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+		},
+		subgroup = 'raw-resource',
+		order = 'b[biter-leech]',
+		stack_size = 100
+	},
+	{
+		type = 'item',
+		name = 'worm-sample',
+		icons =  {
+			{
+				icon = '__nauvis-melange__/graphics/icons/sample.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+			{
+				icon = '__nauvis-melange__/graphics/icons/worm-overlay.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+		},
+		subgroup = 'raw-resource',
+		order = 'b[worm-sample]',
+		stack_size = 100
+	},
+	{
+		type = 'item',
+		name = 'biter-sample',
+		icons =  {
+			{
+				icon = '__nauvis-melange__/graphics/icons/sample.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+			{
+				icon = '__nauvis-melange__/graphics/icons/biter-overlay.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+		},
+		subgroup = 'raw-resource',
+		order = 'b[biter-sample]',
+		stack_size = 100
+	},
+	{
+		type = 'item-with-entity-data',
+		name = 'travel-worm',
+		icon = '__nauvis-melange__/graphics/icons/travel-worm.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'transport',
+		order = 'b[personal-transport]-a[travel-worm]',
+		place_result = 'travel-worm',
+		stack_size = 1
+	},
+	{
+		type = 'item',
+		name = 'spice-overlay',
+		icon = '__nauvis-melange__/graphics/spice-overlay.png',
+		icon_size = 12,
+		stack_size = 1
+	}
 })
