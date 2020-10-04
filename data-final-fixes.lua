@@ -1,10 +1,8 @@
--- Fixing entities
-
 -- Fixing recipes
 local satellite = data.raw['recipe']['satellite']
 table.insert(satellite.ingredients, {'biter-navigator', 1})
 local spidertron = data.raw['recipe']['spidertron']
-spidertron.ingredients = {
+spidertron.normal.ingredients = {
 	{'exoskeleton-equipment', 4},
 	{'fusion-reactor-equipment', 2},
 	{'rocket-launcher', 4},
@@ -14,4 +12,3 @@ spidertron.ingredients = {
 	{'effectivity-module-3', 2},
 	{'biter-navigator', 1},
 }
--- Fixing techs

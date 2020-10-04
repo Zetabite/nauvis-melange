@@ -104,8 +104,8 @@ data:extend({
 	{
 		type = 'recipe',
 		name = 'travel-worm',
-		localised_name = {'item-name.travel-worm'},
-		localised_description = {'item-description.travel-worm'},
+		localised_name = {'entity-name.travel-worm'},
+		localised_description = {'entity-description.travel-worm'},
 		category = 'alien-growing',
 		energy_required = 120,
 		enabled = false,

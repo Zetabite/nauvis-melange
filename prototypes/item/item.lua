@@ -34,8 +34,16 @@ data:extend({
 	{
 		type = 'item',
 		name = 'biter-navigator',
-		icon = '__nauvis-melange__/graphics/icons/drying-rig.png',
-		icon_size = 64, icon_mipmaps = 4,
+		icons =  {
+			{
+				icon = '__base__/graphics/icons/satellite.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+			{
+				icon = '__nauvis-melange__/graphics/icons/biter-overlay.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+		},
 		subgroup = 'intermediate-product',
 		stack_size = 50
 	},
@@ -156,6 +164,8 @@ data:extend({
 	{
 		type = 'item-with-entity-data',
 		name = 'travel-worm',
+		localised_name = {'entity-name.travel-worm'},
+		localised_description = {'entity-description.travel-worm'},
 		icon = '__nauvis-melange__/graphics/icons/travel-worm.png',
 		icon_size = 64, icon_mipmaps = 4,
 		subgroup = 'transport',
