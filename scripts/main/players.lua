@@ -70,11 +70,7 @@ end
 function player_joined(event)
 	local player = game.get_player(event.player_index)
 	if not (global.addiction_system[player.name]) then
-		global.addiction_system[player.name] = {
-			counter = 0,
-			radar = false,
-			radar_tick = 0
-		}
+		global.addiction_system[player.name] = remote.call('nauvis_melange_interface', 'addiction_init_values')
 	end
 end
 
@@ -90,7 +86,7 @@ function remove_addiction()
 		local player = game.get_player(i)
 		if player.character then
 			local counter = global.addiction_system[player.name].counter
-			if math.random(0, 100) > 50 and counter > 0 then
+			if math.random(0, 100) > 75 and counter > 0 then
 				global.addiction_system[player.name].counter = counter - 1
 			end
 		end

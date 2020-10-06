@@ -10,12 +10,25 @@ function built_entity(event)
 	end
 end
 
+function rocket_launch_ordered(event)
+	local silo = event.rocket_silo
+	local force = silo.force
+	local surface = silo.surface
+	local spacing_guild = surface.find_entities_filtered({name = 'spacing-guild', force = force})
+	if #spacing_guild > 0 then
+		force.print({'nauvis-melange.guild-approval-message'})
+	else
+		force.print({'nauvis-melange.guild-intervention-message'})
+	end
+end
+
 -- lib
 local lib = {}
 
 lib.events = {
 	[defines.events.on_built_entity] = built_entity,
 	[defines.events.on_robot_built_entity] = built_entity,
+	[defines.events.on_rocket_launch_ordered] = rocket_launch_ordered,
 }
 
 lib.on_nth_tick = {

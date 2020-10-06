@@ -40,7 +40,7 @@ data:extend({
 		type = 'technology',
 		name = 'alien-breeding',
 		icon_size = 64,
-		icon = '__nauvis-melange__/graphics/technology/spice-processing.png',
+		icon = '__nauvis-melange__/graphics/technology/alien-breeding.png',
 		prerequisites = {'spice-processing'},
 		effects = {
 			{
@@ -76,20 +76,29 @@ data:extend({
 	{
 		type = 'technology',
 		name = 'spacing-guild',
-		icon_size = 64,
-		icon = '__nauvis-melange__/graphics/technology/spice-processing.png',
+		icon_size = 128,
+		icon = '__nauvis-melange__/graphics/technology/spacing-guild.png',
 		prerequisites = {'spice-processing', 'alien-breeding'},
 		effects = {
 			{
 				type = 'unlock-recipe',
 				recipe = 'biter-navigator'
 			},
+			{
+				type = 'unlock-recipe',
+				recipe = 'fish-navigator'
+			},
+			{
+				type = 'unlock-recipe',
+				recipe = 'spacing-guild'
+			},
 		},
 		unit = {
-			count = 250,
+			count = 100,
 			ingredients = {
 				{'automation-science-pack', 1},
-				{'logistic-science-pack', 1}
+				{'logistic-science-pack', 1},
+				{'chemical-science-pack', 1}
 			},
 			time = 30
 		},

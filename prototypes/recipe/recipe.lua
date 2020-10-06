@@ -1,4 +1,5 @@
 data:extend({
+	-- Entities
 	{
 		type = 'recipe',
 		name = 'water-injector-proxy',
@@ -42,6 +43,36 @@ data:extend({
 		},
 		result = 'alien-growth-chamber'
 	},
+	{
+		type = 'recipe',
+		name = 'travel-worm',
+		localised_name = {'entity-name.travel-worm'},
+		localised_description = {'entity-description.travel-worm'},
+		category = 'alien-growing',
+		energy_required = 120,
+		enabled = false,
+		ingredients = {
+			{ 'sandtrout', 1 },
+			{ 'spice', 50 }
+		},
+		result = 'travel-worm'
+	},
+	{
+		type = 'recipe',
+		name = 'spacing-guild',
+		localised_name = {'entity-name.spacing-guild'},
+		localised_description = {'entity-description.spacing-guild'},
+		category = 'crafting',
+		energy_required = 60,
+		enabled = false,
+		ingredients = {
+			{ 'steel-plate', 5 },
+			{ 'pipe', 23 }
+		},
+		result = 'spacing-guild'
+	},
+
+	-- Items
 	{
 		type = 'recipe',
 		name = 'solar-component-foil',
@@ -103,20 +134,6 @@ data:extend({
 	},
 	{
 		type = 'recipe',
-		name = 'travel-worm',
-		localised_name = {'entity-name.travel-worm'},
-		localised_description = {'entity-description.travel-worm'},
-		category = 'alien-growing',
-		energy_required = 120,
-		enabled = false,
-		ingredients = {
-			{ 'sandtrout', 1 },
-			{ 'spice', 50 }
-		},
-		result = 'travel-worm'
-	},
-	{
-		type = 'recipe',
 		name = 'biter-leech',
 		localised_name = {'item-name.biter-leech'},
 		localised_description = {'item-description.biter-leech'},
@@ -150,15 +167,31 @@ data:extend({
 		name = 'biter-navigator',
 		localised_name = {'item-name.biter-navigator'},
 		localised_description = {'item-description.biter-navigator'},
-		category = 'crafting-with-fluid',
+		category = 'space-education',
 		energy_required = 60,
 		enabled = false,
 		ingredients = {
 			{ type = 'item', name = 'biter-leech', amount = 1 },
 			{ type = 'item', name = 'low-density-structure', amount = 2 },
 			{ type = 'item', name = 'advanced-circuit', amount = 4 },
-			{ type = 'fluid', name = 'spice-gas', amount = 20 },
+			{ type = 'fluid', name = 'spice-gas', amount = 200 },
 		},
 		result = 'biter-navigator'
+	},
+	{
+		type = 'recipe',
+		name = 'fish-navigator',
+		localised_name = {'item-name.fish-navigator'},
+		localised_description = {'item-description.fish-navigator'},
+		category = 'space-education',
+		energy_required = 60,
+		enabled = false,
+		ingredients = {
+			{ type = 'item', name = 'raw-fish', amount = 1 },
+			{ type = 'item', name = 'low-density-structure', amount = 2 },
+			{ type = 'item', name = 'advanced-circuit', amount = 4 },
+			{ type = 'fluid', name = 'spice-gas', amount = 200 },
+		},
+		result = 'fish-navigator'
 	},
 })

@@ -10,7 +10,7 @@ data:extend({
 		collision_box = {{ -1.45, -1.45}, {1.45, 1.45}},
 		selection_box = {{ -1.5, -1.5}, {1.5, 1.5}},
 		highlight = true,
-		minable = { mining_time = 1, result = 'pre-spice-mass' },
+		minable = {mining_time = 1},
 		category = 'deep-solid',
 		minimum = 1,
 		normal = 1,

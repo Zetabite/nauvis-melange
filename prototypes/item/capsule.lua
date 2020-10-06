@@ -56,7 +56,7 @@ data:extend({
 		},
 		subgroup = 'intermediate-product',
 		order = 'd[spice]',
-		stack_size = 50
+		stack_size = 100
 	},
 	{
 		type = 'capsule',

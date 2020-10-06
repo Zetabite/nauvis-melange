@@ -1,4 +1,5 @@
 data:extend({
+	-- Entities
 	{
 		type = 'item',
 		name = 'water-injector-proxy',
@@ -11,6 +12,54 @@ data:extend({
 		place_result = 'water-injector-proxy',
 		stack_size = 50
 	},
+	{
+		type = 'item',
+		name = 'alien-growth-chamber',
+		localised_name = {'entity-name.alien-growth-chamber'},
+		localised_description = {'entity-description.alien-growth-chamber'},
+		icon = '__nauvis-melange__/graphics/icons/alien-growth-chamber.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'production-machine',
+		place_result = 'alien-growth-chamber',
+		stack_size = 50
+	},
+	{
+		type = 'item',
+		name = 'spacing-guild',
+		localised_name = {'entity-name.spacing-guild'},
+		localised_description = {'entity-description.spacing-guild'},
+		icon = '__nauvis-melange__/graphics/icons/spacing-guild.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'production-machine',
+		place_result = 'spacing-guild',
+		stack_size = 50
+	},
+	{
+		type = 'item',
+		name = 'drying-rig',
+		localised_name = {'entity-name.drying-rig'},
+		localised_description = {'entity-description.drying-rig'},
+		icon = '__nauvis-melange__/graphics/icons/drying-rig.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'production-machine',
+		order = 'a[drying-rig]',
+		place_result = 'drying-rig',
+		stack_size = 50
+	},
+	{
+		type = 'item-with-entity-data',
+		name = 'travel-worm',
+		localised_name = {'entity-name.travel-worm'},
+		localised_description = {'entity-description.travel-worm'},
+		icon = '__nauvis-melange__/graphics/icons/travel-worm.png',
+		icon_size = 64, icon_mipmaps = 4,
+		subgroup = 'transport',
+		order = 'b[personal-transport]-a[travel-worm]',
+		place_result = 'travel-worm',
+		stack_size = 1
+	},
+
+	-- Items
 	{
 		type = 'item',
 		name = 'solar-component-foil',
@@ -36,7 +85,7 @@ data:extend({
 		name = 'biter-navigator',
 		icons =  {
 			{
-				icon = '__base__/graphics/icons/satellite.png',
+				icon = '__nauvis-melange__/graphics/icons/navigator.png',
 				icon_size = 64, icon_mipmaps = 4,
 			},
 			{
@@ -49,13 +98,18 @@ data:extend({
 	},
 	{
 		type = 'item',
-		name = 'alien-growth-chamber',
-		localised_name = {'entity-name.alien-growth-chamber'},
-		localised_description = {'entity-description.alien-growth-chamber'},
-		icon = '__nauvis-melange__/graphics/icons/alien-growth-chamber.png',
-		icon_size = 64, icon_mipmaps = 4,
-		subgroup = 'production-machine',
-		place_result = 'alien-growth-chamber',
+		name = 'fish-navigator',
+		icons =  {
+			{
+				icon = '__nauvis-melange__/graphics/icons/navigator.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+			{
+				icon = '__nauvis-melange__/graphics/icons/fish-overlay.png',
+				icon_size = 64, icon_mipmaps = 4,
+			},
+		},
+		subgroup = 'intermediate-product',
 		stack_size = 50
 	},
 	--[[
@@ -71,18 +125,6 @@ data:extend({
 		stack_size = 50
 	},
 	--]]
-	{
-		type = 'item',
-		name = 'drying-rig',
-		localised_name = {'entity-name.drying-rig'},
-		localised_description = {'entity-description.drying-rig'},
-		icon = '__nauvis-melange__/graphics/icons/drying-rig.png',
-		icon_size = 64, icon_mipmaps = 4,
-		subgroup = 'production-machine',
-		order = 'a[drying-rig]',
-		place_result = 'drying-rig',
-		stack_size = 50
-	},
 	{
 		type = 'item',
 		name = 'pre-spice-mass',
@@ -105,7 +147,7 @@ data:extend({
 				icon_size = 64, icon_mipmaps = 4,
 			},
 		},
-		subgroup = 'raw-resource',
+		subgroup = 'alien-breeding',
 		order = 'b[sandtrout]',
 		place_result = 'worm-hole',
 		stack_size = 100
@@ -123,7 +165,7 @@ data:extend({
 				icon_size = 64, icon_mipmaps = 4,
 			},
 		},
-		subgroup = 'raw-resource',
+		subgroup = 'alien-breeding',
 		order = 'b[biter-leech]',
 		stack_size = 100
 	},
@@ -140,7 +182,7 @@ data:extend({
 				icon_size = 64, icon_mipmaps = 4,
 			},
 		},
-		subgroup = 'raw-resource',
+		subgroup = 'alien-breeding',
 		order = 'b[worm-sample]',
 		stack_size = 100
 	},
@@ -157,22 +199,12 @@ data:extend({
 				icon_size = 64, icon_mipmaps = 4,
 			},
 		},
-		subgroup = 'raw-resource',
+		subgroup = 'alien-breeding',
 		order = 'b[biter-sample]',
 		stack_size = 100
 	},
-	{
-		type = 'item-with-entity-data',
-		name = 'travel-worm',
-		localised_name = {'entity-name.travel-worm'},
-		localised_description = {'entity-description.travel-worm'},
-		icon = '__nauvis-melange__/graphics/icons/travel-worm.png',
-		icon_size = 64, icon_mipmaps = 4,
-		subgroup = 'transport',
-		order = 'b[personal-transport]-a[travel-worm]',
-		place_result = 'travel-worm',
-		stack_size = 1
-	},
+
+	-- Misc
 	{
 		type = 'item',
 		name = 'spice-overlay',

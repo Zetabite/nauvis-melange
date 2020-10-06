@@ -7,6 +7,80 @@ local blank = {
 	height = 64,
 }
 
+function spacing_guild_fluid_box(production_type, position)
+	local base_level = {['input'] = -1, ['output'] = 1}
+	return {
+		filter = 'spice-gas',
+		production_type = production_type,
+		--pipe_picture = assembler3pipepictures(),
+		pipe_covers = pipecoverspictures(),
+		base_area = 10,
+		base_level = base_level[production_type],
+		pipe_connections = {{ type=production_type, position = position }},
+		--secondary_draw_orders = { north = -1 }
+	}
+end
+
+function spacing_guild_picture(version)
+	return {
+		layers = {
+			{
+				filename = '__nauvis-melange__/graphics/entity/spacing-guild/spacing-guild-'..version..'.png',
+				priority = 'high',
+				width = 110,
+				height = 108,
+				frame_count = 1,
+				shift = util.by_pixel(0, 4),
+				hr_version = {
+					filename = '__nauvis-melange__/graphics/entity/spacing-guild/hr-spacing-guild-'..version..'.png',
+					priority = 'high',
+					width = 219,
+					height = 215,
+					frame_count = 1,
+					shift = util.by_pixel(-0.25, 3.75),
+					scale = 0.5
+				}
+			},
+			{
+				filename = '__nauvis-melange__/graphics/entity/spacing-guild/spacing-guild-shadow.png',
+				priority = 'high',
+				width = 122,
+				height = 68,
+				shift = util.by_pixel(13, 11),
+				draw_as_shadow = true,
+				hr_version = {
+					filename = '__nauvis-melange__/graphics/entity/spacing-guild/hr-spacing-guild-shadow.png',
+					priority = 'high',
+					width = 243,
+					height = 136,
+					shift = util.by_pixel(13, 11),
+					draw_as_shadow = true,
+					scale = 0.5
+				}
+			},
+			--[[
+			{
+				filename = '__nauvis-melange__/graphics/entity/spacing-guild/hr-spacing-guild-'..version..'-shadow.png',
+				priority = 'high',
+				width = 146,
+				height = 77,
+				shift = util.by_pixel(30, 22.5),
+				draw_as_shadow = true,
+				hr_version = {
+					filename = '__nauvis-melange__/graphics/entity/spacing-guild/hr-spacing-guild-'..version..'-shadow.png',
+					priority = 'high',
+					width = 291,
+					height = 153,
+					shift = util.by_pixel(29.75, 22.25),
+					draw_as_shadow = true,
+					scale = 0.5
+				}
+			}
+			--]]
+		}
+	}
+end
+
 data:extend({
 	{
 		type = 'mining-drill',
@@ -325,5 +399,58 @@ data:extend({
 			height = 64,
 			direction_count = 1,
 		}
-	}
+	},
+	{
+		type = 'assembling-machine',
+		name = 'spacing-guild',
+		icon = '__nauvis-melange__/graphics/icons/spacing-guild.png',
+		icon_size = 64, icon_mipmaps = 4,
+		flags = {'placeable-neutral', 'placeable-player', 'player-creation'},
+		minable = {mining_time = 0.1, result = 'spacing-guild'},
+		max_health = 500,
+		corpse = 'lab-remnants',
+		dying_explosion = 'lab-explosion',
+		collision_box = {{-1.3, -1.3}, {1.3, 1.3}},
+		selection_box = {{-1.5, -1.5}, {1.5, 1.5}},
+		damaged_trigger_effect = hit_effects.entity(),
+		energy_source = {
+			type = 'electric',
+			usage_priority = 'primary-input'
+		},
+		fluid_usage_per_tick = 0.5,
+		burns_fluid = true,
+		crafting_categories = {'space-education'},
+		crafting_speed = 1,
+		energy_usage = '150kW',
+		--[[
+        { position = {-1, -2} },
+        { position = {2, 1} },
+        { position = {1, 2} },
+        { position = {-2, -1} }
+		--]]
+		fluid_boxes = {
+			spacing_guild_fluid_box('input', {-1, -2}),
+			spacing_guild_fluid_box('input', {-2, -1}),
+			spacing_guild_fluid_box('output', {2, 1}),
+			spacing_guild_fluid_box('output', {1, 2}),
+			off_when_no_fluid_recipe = false
+		},
+		animation = {
+			north = spacing_guild_picture(1),
+			east = spacing_guild_picture(2),
+			south = spacing_guild_picture(1),
+			west = spacing_guild_picture(2)
+		},
+		open_sound = sounds.machine_open,
+		close_sound = sounds.machine_close,
+		vehicle_impact_sound = sounds.generic_impact,
+		working_sound = {
+		  	sound = {
+				{
+					filename = '__base__/sound/assembling-machine-t1-1.ogg',
+					volume = 0.5
+				},
+			},
+		}
+	},
 })

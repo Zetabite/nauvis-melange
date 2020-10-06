@@ -1,13 +1,26 @@
+remote.add_interface('nauvis_melange_interface', {
+	addiction_init_values = function()
+		return {counter = 0,radar = false,radar_tick = 0}
+	end
+})
+
 -- Addiction System
 function addiction_system_init()
 	global.addiction_system = {}
 end
 
-function addiction_system_reload()
+function addiction_system_configuration_changed()
 	if global.addiction_system then
 		local addiction_system = {}
-		for key, value in pairs(global.addiction_system) do
-			addiction_system[key] = value
+		for key, entry in pairs(global.addiction_system) do
+			if #entry <= 0 then
+				for subkey, value in pairs(remote.call('nauvis_melange_interface', 'addiction_init_values')) do
+					if not entry[subkey] then
+						entry[subkey] = value
+					end
+				end
+			end
+			addiction_system[key] = entry
 		end
 		global.addiction_system = addiction_system
 	else
@@ -86,7 +99,7 @@ lib.on_init = function()
 end
 
 lib.on_configuration_changed = function()
-	addiction_system_reload()
+	addiction_system_configuration_changed()
 	aliens_table_init()
 end
 
