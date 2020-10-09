@@ -1,8 +1,25 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.7.0
+Date: 09.10.2020
+  Changes:
+    - Renamed tables
+    - Added spacing guild
+    - Moved navigator recipes to spacing guild
+    - Spacing guild is now required to start a rocket
+    - Added spice winning condition (Krastorio 2 compatible)
+    - Added slight support of Space Exploration
+    - Added technologies
+    - Added Informatron support (contribute by submitting texts)
+  Bugfixes:
+    - Player table, formely known as addiction system, should no longer crash existing games
+    - Game no longer crashes when car entity doesnt have spice in inventory
+
+---------------------------------------------------------------------------------------------------
 Version: 0.6.0
 Date: 04.10.2020
   Changes:
     - Added addiction system
+    - Player gains prescience when using spice (a huge chunk of map is revealed while under the influence)
     - Added alien breeding for small biter and worm, use alien probe to get samples
     - Added overlay when using spice
     - Added travel with small worm

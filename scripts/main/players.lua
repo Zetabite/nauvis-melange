@@ -1,3 +1,4 @@
+local players_table
 local SPICE_COOLDOWN = 18000
 local SPICE_DURATION = 3600
 
@@ -9,10 +10,11 @@ end
 function used_capsule(event)
 	local capsule = event.item
 	if string.match(capsule.name, 'spice') then
-		local player = game.get_player(event.player_index)
+		local player_index = event.player_index
+		local player = game.get_player(player_index)
 		if (player.character) then
 			local character = player.character
-			local counter = global.addiction_system[player.name].counter
+			local counter = players_table[player_index].counter
 			local inventory = character.get_main_inventory()
 			local needed = math.floor(-2 + 0.5 * counter * counter)
 			if needed >= 1 then
@@ -24,11 +26,11 @@ function used_capsule(event)
 					character.character_running_speed_modifier = speed_modifier - 2
 				end
 			end
-			global.addiction_system[player.name].counter = counter + 1
+			players_table[player_index].counter = counter + 1
 			local surface = character.surface
 			local radar = surface.create_entity({name = 'spice-radar', position = character.position, force = character.force})
-			global.addiction_system[player.name].radar = radar
-			global.addiction_system[player.name].radar_tick = SPICE_COOLDOWN
+			players_table[player_index].radar = radar
+			players_table[player_index].radar_tick = SPICE_COOLDOWN
 			draw_spice_overlay(player)
 		end
 		apply_spice_to_vehicle(player)
@@ -68,55 +70,56 @@ function apply_spice_to_vehicle(player)
 end
 
 function player_joined(event)
-	local player = game.get_player(event.player_index)
-	if not (global.addiction_system[player.name]) then
-		global.addiction_system[player.name] = remote.call('nauvis_melange_interface', 'addiction_init_values')
+	local player_index = event.player_index
+	if not (players_table[player_index]) then
+		players_table[player_index] = remote.call('nauvis_melange_interface', 'forces_init_values')
 	end
 end
 
 function player_died(event)
-	local player = game.get_player(event.player_index)
-	global.addiction_system[player.name].counter = 0
-	global.addiction_system[player.name].radar.destroy()
-	global.addiction_system[player.name].radar = nil
+	local player_index = event.player_index
+	players_table[player_index].counter = 0
+	players_table[player_index].radar.destroy()
+	players_table[player_index].radar = nil
 end
 
 function remove_addiction()
-	for i = 1, #game.connected_players, 1 do
-		local player = game.get_player(i)
+	for _, player in pairs(game.connected_players) do
+		local player_index = player.index
 		if player.character then
-			local counter = global.addiction_system[player.name].counter
+			local counter = players_table[player_index].counter
 			if math.random(0, 100) > 75 and counter > 0 then
-				global.addiction_system[player.name].counter = counter - 1
+				players_table[player_index].counter = counter - 1
 			end
 		end
 	end
 end
 
 function remove_spice_radar()
-	if (global.addiction_system) then
-		for name, value in pairs(global.addiction_system) do
+	if (players_table) then
+		for player_index, value in pairs(players_table) do
 			if value['radar'] then
 				value['radar_tick'] = value['radar_tick'] - SPICE_DURATION
 				if value['radar_tick'] <= 0 then
 					value['radar'].destroy()
 					value['radar'] = false
 				end
-				global.addiction_system[name] = value
+				players_table[player_index] = value
 			end
 		end
 	end
 end
 
 function player_moved(event)
-	local player = game.get_player(event.player_index)
+	local player_index = event.player_index
+	local player = game.get_player(player_index)
 	if (player.character) then
 		local character = player.character
 		if has_spice(character) then
 			local surface = player.surface
 			local radar = surface.create_entity({name = 'spice-radar', position = character.position, force = character.force})
-			global.addiction_system[player.name].radar.destroy()
-			global.addiction_system[player.name].radar = radar
+			players_table[player_index].radar.destroy()
+			players_table[player_index].radar = radar
 		end
 	end
 end
@@ -152,6 +155,10 @@ function draw_spice_overlay(player)
 	})
 end
 
+function player_removed(event)
+	table.remove(players_table, event.player_index)
+end
+
 -- lib
 local lib = {}
 
@@ -162,6 +169,7 @@ lib.events = {
 	[defines.events.on_player_died] = player_died,
 	[defines.events.on_player_changed_position] = player_moved,
 	[defines.events.on_player_changed_surface] = player_moved,
+	[defines.events.on_player_removed] = player_removed,
 }
 
 lib.on_nth_tick = {
@@ -172,5 +180,17 @@ lib.on_nth_tick = {
 		remove_spice_radar()
 	end
 }
+
+lib.on_init = function()
+	players_table = global.players
+end
+
+lib.on_configuration_changed = function()
+	players_table = global.players
+end
+
+lib.on_load = function ()
+	players_table = global.players
+end
 
 return lib

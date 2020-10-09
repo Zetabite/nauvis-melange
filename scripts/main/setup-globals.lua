@@ -1,35 +1,88 @@
 remote.add_interface('nauvis_melange_interface', {
-	addiction_init_values = function()
+	players_init_values = function()
 		return {counter = 0,radar = false,radar_tick = 0}
+	end,
+	forces_init_values = function()
+		return {spice_shipped = 0}
+	end,
+	spice_for_victory_count = function()
+		return 10000
 	end
 })
 
--- Addiction System
-function addiction_system_init()
-	global.addiction_system = {}
+-- Player table
+function players_table_init()
+	global.players = {}
+	for _, player in pairs(game.connected_players) do
+		global.players[player.index] = remote.call('nauvis_melange_interface', 'forces_init_values')
+	end
 end
 
-function addiction_system_configuration_changed()
+function players_table_configuration_changed()
 	if global.addiction_system then
-		local addiction_system = {}
-		for key, entry in pairs(global.addiction_system) do
+		players_table_init()
+		local players = {}
+		for player_name, entry in pairs(global.addiction_system) do
 			if #entry <= 0 then
-				for subkey, value in pairs(remote.call('nauvis_melange_interface', 'addiction_init_values')) do
+				for subkey, value in pairs(remote.call('nauvis_melange_interface', 'players_init_values')) do
 					if not entry[subkey] then
 						entry[subkey] = value
 					end
 				end
 			end
-			addiction_system[key] = entry
+			local player_index = game.get_player(player_name).index
+			players[player_index] = entry
 		end
-		global.addiction_system = addiction_system
+		global.players = players
+	end
+	if global.players then
+		local players = {}
+		for player_index, entry in pairs(global.players) do
+			if #entry <= 0 then
+				for subkey, value in pairs(remote.call('nauvis_melange_interface', 'players_init_values')) do
+					if not entry[subkey] then
+						entry[subkey] = value
+					end
+				end
+			end
+			players[player_index] = entry
+		end
+		global.players = players
 	else
-		addiction_system_init()
+		players_table_init()
+	end
+end
+
+-- Forces table for winning condition
+function forces_table_init()
+	global.forces = {}
+	for _, force in pairs(game.forces) do
+		global.forces[force.index] = remote.call('nauvis_melange_interface', 'forces_init_values')
+	end
+end
+
+function forces_table_configuration_changed()
+	if global.forces then
+		local forces = {}
+		for force_index, entry in pairs(global.forces) do
+			if #entry <= 0 then
+				for subkey, value in pairs(remote.call('nauvis_melange_interface', 'forces_init_values')) do
+					if not entry[subkey] then
+						entry[subkey] = value
+					end
+				end
+			end
+			forces[force_index] = entry
+		end
+		global.forces = forces
+	else
+		forces_table_init()
 	end
 end
 
 -- Aliens Table
 function aliens_table_init()
+	global.aliens = {}
 	-- Creating enums from mods
 	local enum_aliens = {
 		['biter'] = {},
@@ -79,28 +132,40 @@ function aliens_table_init()
 		end
 		enum_aliens_reverse[type_name] = reverse
 	end
-	global.enum_aliens = enum_aliens
-	global.enum_alien_names = enum_alien_names
-	global.enum_alien_collector = enum_alien_collector
-	global.enum_alien_melee = enum_alien_melee
-	global.enum_aliens_reverse = enum_aliens_reverse
+
+	global.aliens.names = enum_alien_names
+	global.aliens.collector = enum_alien_collector
+	global.aliens.melee = enum_alien_melee
+	global.aliens.reverse = enum_aliens_reverse
+end
+
+-- Competitor spice table
+function competitor_spice_table_init()
+	global.competitor_spice = {}
+	if script.active_mods['space-exploration'] then
+		local spice_name = 'se-vitamelange'
+		local spice_suffix = { '', '-spice', '-nugget', '-roast', '-extract'}
+		for _, suffix in pairs(spice_suffix) do
+			table.insert(global.competitor_spice, (spice_name..suffix))
+		end
+	end
 end
 
 -- lib
 local lib = {}
 
-lib.events = {
-	[defines.events.on_trigger_created_entity] = created_entity,
-}
-
 lib.on_init = function()
-	addiction_system_init()
+	players_table_init()
 	aliens_table_init()
+	competitor_spice_table_init()
+	forces_table_init()
 end
 
 lib.on_configuration_changed = function()
-	addiction_system_configuration_changed()
+	players_table_configuration_changed()
 	aliens_table_init()
+	competitor_spice_table_init()
+	forces_table_configuration_changed()
 end
 
 return lib

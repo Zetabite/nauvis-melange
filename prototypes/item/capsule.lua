@@ -84,7 +84,7 @@ data:extend({
 				}
 			}
 		},
-		subgroup = 'capsule',
+		subgroup = 'alien-breeding',
 		order = 'd[alien-probe]',
 		stack_size = 50
 	}

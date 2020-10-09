@@ -6,7 +6,24 @@ function built_entity(event)
 			local pos = entity.position
 			entity.destroy()
 			surface.create_entity({name = 'water-injector', position = pos, force = 'neutral'})
+		elseif entity.name == 'spacing-guild' then enable_silos(entity)
+		elseif entity.name == 'rocket-silo' then enable_silos(entity)
 		end
+	end
+end
+
+--[[
+	We only enable silos, but dont disable them, so that once a rocket is launched, it cant be stopped,
+	as they are disabled anyways before being launched.
+	This might be exploitable, but everything else would only hurt honest players
+--]]
+function enable_silos(entity)
+	local force = entity.force
+	local surface = entity.surface
+	local spacing_guilds = surface.find_entities_filtered({name = 'spacing-guild', force = force})
+	local silos = surface.find_entities_filtered({name = 'rocket-silo', force = force})
+	for _, silo in pairs(silos) do
+		if #spacing_guilds >= #silos then silo.active = true end
 	end
 end
 
@@ -14,12 +31,14 @@ function rocket_launch_ordered(event)
 	local silo = event.rocket_silo
 	local force = silo.force
 	local surface = silo.surface
-	local spacing_guild = surface.find_entities_filtered({name = 'spacing-guild', force = force})
-	if #spacing_guild > 0 then
+	local spacing_guilds = surface.find_entities_filtered({name = 'spacing-guild', force = force})
+	local silos = surface.find_entities_filtered({name = 'rocket-silo', force = force})
+	if #spacing_guilds >= #silos then
 		force.print({'nauvis-melange.guild-approval-message'})
 	else
 		force.print({'nauvis-melange.guild-intervention-message'})
 	end
+	silo.active = (#spacing_guilds >= #silos)
 end
 
 -- lib

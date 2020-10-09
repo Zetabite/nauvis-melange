@@ -1,17 +1,17 @@
+local aliens_table
 local spice_evolution_factor = settings.global['spice-evolution-factor'].value
 local spice_direct_evolution_level = settings.global['spice-direct-evolution-level'].value
 local spice_evolve_neighbours = settings.global['spice-evolve-neighbours'].value
 local spice_evolve_neighbours_radius = settings.global['spice-evolve-neighbours-radius'].value
 
 function update_vars(event)
-	local setting = event.setting
-	if setting == 'spice-evolution-factor' then
+	if event.setting == 'spice-evolution-factor' then
 		spice_evolution_factor = settings.global['spice-evolution-factor'].value
-	elseif setting == 'spice-direct-evolution-level' then
+	elseif event.setting == 'spice-direct-evolution-level' then
 		spice_direct_evolution_level = settings.global['spice-direct-evolution-level'].value
-	elseif setting == 'spice-evolve-neighbours' then
+	elseif event.setting == 'spice-evolve-neighbours' then
 		spice_evolve_neighbours = settings.global['spice-evolve-neighbours'].value
-	elseif setting == 'spice-evolve-neighbours-radius' then
+	elseif event.setting == 'spice-evolve-neighbours-radius' then
 		spice_evolve_neighbours_radius = settings.global['spice-evolve-neighbours-radius'].value
 	end
 end
@@ -26,9 +26,9 @@ function created_entity(event)
 		if (alien) then
 			alien = alien[1]
 			local sample = nil
-			if global.enum_aliens_reverse['biter'][alien.name] then
+			if aliens_table.reverse['biter'][alien.name] then
 				sample = { name = 'biter-sample', count = 1 }
-			elseif global.enum_aliens_reverse['worm-turret'][alien.name] then
+			elseif aliens_table.reverse['worm-turret'][alien.name] then
 				sample = { name = 'worm-sample', count = 1 }
 			end
 			if (sample) then
@@ -70,7 +70,7 @@ function spice_effects(cause, victim, player_index)
 			if spice_evolve_neighbours then
 				local surface = cause.surface
 				local position = cause.position
-				local aliens = surface.find_entities_filtered({ name = global.enum_alien_names, position = position, radius = spice_evolve_neighbours_radius, force = 'enemy'})
+				local aliens = surface.find_entities_filtered({ name = aliens_table.names, position = position, radius = spice_evolve_neighbours_radius, force = 'enemy'})
 				for _, alien in pairs(aliens) do
 					if alien ~= cause then evolve_alien(alien, spice_direct_evolution_level - 1) end
 				end
@@ -112,9 +112,12 @@ function has_spice_in_inventory(collector, victim, player_index)
 		else return false end
 	end
 	amount = inventory.get_item_count('spice')
-	inventory.remove({name = 'spice', count = amount})
-	if amount > 0 then return amount
-	else return false end
+	if amount > 0 then
+		inventory.remove({name = 'spice', count = amount})
+		return amount
+	else
+		return false
+	end
 end
 
 function evolve_alien(alien, steps)
@@ -129,9 +132,9 @@ function evolve_alien(alien, steps)
 end
 
 function get_next_level(name, steps)
-	for type_name, entry in pairs(global.enum_aliens) do
-		if global.enum_aliens_reverse[type_name][name] then
-			local tier = global.enum_aliens_reverse[type_name][name]
+	for type_name, entry in pairs(aliens_table) do
+		if aliens_table.reverse[type_name][name] then
+			local tier = aliens_table.reverse[type_name][name]
 			local next_tier = tier + steps
 			if entry[next_tier] then return entry[next_tier].name
 			else return entry[#entry].name end
@@ -150,17 +153,16 @@ end
 
 -- only allows melee units to collect spice
 function is_spice_collector(cause, victim)
-	if global.enum_alien_melee[cause.name] then
+	if aliens_table.melee[cause.name] then
 		return cause
 	else
 		local surface = victim.surface
 		local position = victim.position
-		local brutus = surface.find_entities_filtered({name = global.enum_alien_names, position = position, radius = 1, force = 'enemy', limit = 1})
+		local brutus = surface.find_entities_filtered({name = aliens_table.names, position = position, radius = 1, force = 'enemy', limit = 1})
 		if (brutus) then return brutus end
 	end
 	return false
 end
---global.enum_alien_collector[cause.name]
 
 -- lib
 local lib = {}
@@ -171,5 +173,17 @@ lib.events = {
 	[defines.events.on_trigger_created_entity] = created_entity,
 	[defines.events.on_runtime_mod_setting_changed] = update_vars,
 }
+
+lib.on_init = function()
+	aliens_table = global.aliens
+end
+
+lib.on_configuration_changed = function()
+	aliens_table = global.aliens
+end
+
+lib.on_load = function ()
+	aliens_table = global.aliens
+end
 
 return lib

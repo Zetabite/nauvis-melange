@@ -20,6 +20,7 @@ data:extend({
 		icon = '__nauvis-melange__/graphics/icons/alien-growth-chamber.png',
 		icon_size = 64, icon_mipmaps = 4,
 		subgroup = 'production-machine',
+		order = 'zb[alien-growth-chamber]',
 		place_result = 'alien-growth-chamber',
 		stack_size = 50
 	},
@@ -31,6 +32,7 @@ data:extend({
 		icon = '__nauvis-melange__/graphics/icons/spacing-guild.png',
 		icon_size = 64, icon_mipmaps = 4,
 		subgroup = 'production-machine',
+		order = 'zb[spacing-guild]',
 		place_result = 'spacing-guild',
 		stack_size = 50
 	},
@@ -42,7 +44,7 @@ data:extend({
 		icon = '__nauvis-melange__/graphics/icons/drying-rig.png',
 		icon_size = 64, icon_mipmaps = 4,
 		subgroup = 'production-machine',
-		order = 'a[drying-rig]',
+		order = 'za[drying-rig]',
 		place_result = 'drying-rig',
 		stack_size = 50
 	},

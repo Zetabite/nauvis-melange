@@ -63,11 +63,13 @@ data:extend({
 		localised_name = {'entity-name.spacing-guild'},
 		localised_description = {'entity-description.spacing-guild'},
 		category = 'crafting',
-		energy_required = 60,
+		energy_required = 20,
 		enabled = false,
 		ingredients = {
-			{ 'steel-plate', 5 },
-			{ 'pipe', 23 }
+			{ 'spice', 40 },
+			{ 'pipe', 20 },
+			{ 'advanced-circuit', 20 },
+			{ 'steel-plate', 20 },
 		},
 		result = 'spacing-guild'
 	},
@@ -151,8 +153,8 @@ data:extend({
 	{
 		type = 'recipe',
 		name = 'alien-probe',
-		localised_name = {'capsule-name.alien-probe'},
-		localised_description = {'capsule-description.alien-probe'},
+		localised_name = {'item-name.alien-probe'},
+		localised_description = {'item-description.alien-probe'},
 		category = 'crafting',
 		energy_required = 4,
 		enabled = false,
@@ -172,7 +174,7 @@ data:extend({
 		enabled = false,
 		ingredients = {
 			{ type = 'item', name = 'biter-leech', amount = 1 },
-			{ type = 'item', name = 'low-density-structure', amount = 2 },
+			{ type = 'item', name = 'low-density-structure', amount = 10 },
 			{ type = 'item', name = 'advanced-circuit', amount = 4 },
 			{ type = 'fluid', name = 'spice-gas', amount = 200 },
 		},
@@ -188,7 +190,7 @@ data:extend({
 		enabled = false,
 		ingredients = {
 			{ type = 'item', name = 'raw-fish', amount = 1 },
-			{ type = 'item', name = 'low-density-structure', amount = 2 },
+			{ type = 'item', name = 'low-density-structure', amount = 10 },
 			{ type = 'item', name = 'advanced-circuit', amount = 4 },
 			{ type = 'fluid', name = 'spice-gas', amount = 200 },
 		},
