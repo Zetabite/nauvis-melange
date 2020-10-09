@@ -37,7 +37,7 @@ function used_capsule(event)
 	end
 end
 
-function has_spice(entity)
+function has_spice_effects(entity)
 	if (entity.stickers) then
 		for _, sticker in pairs(entity.stickers) do
 			if string.match(sticker.name, 'spice') then
@@ -47,24 +47,17 @@ function has_spice(entity)
 	end
 	return false
 end
---[[
-function trigger_addiction(character)
-end
-
-
-function apply_spice_to_character(character)
-end
---]]
 
 function apply_spice_to_vehicle(player)
 	if (player.vehicle) then
 		local vehicle = player.vehicle
-		-- might add black list for certain vehicles
-		if not has_spice(vehicle) then
-			local surface = vehicle.surface
-			local position = vehicle.position
-			surface.create_entity({ name = 'spice-speed-sticker', target = vehicle, position = position })
-			surface.create_entity({ name = 'spice-vehicle-regen-sticker', target = vehicle, position = position })
+		if vehicle.type == 'car' and not spice_effects_blacklist['name'][vehicle.name] then
+			if not has_spice_effects(vehicle) then
+				local surface = vehicle.surface
+				local position = vehicle.position
+				surface.create_entity({ name = 'spice-speed-sticker', target = vehicle, position = position })
+				surface.create_entity({ name = 'spice-vehicle-regen-sticker', target = vehicle, position = position })
+			end
 		end
 	end
 end
@@ -115,7 +108,7 @@ function player_moved(event)
 	local player = game.get_player(player_index)
 	if (player.character) then
 		local character = player.character
-		if has_spice(character) then
+		if has_spice_effects(character) then
 			local surface = player.surface
 			local radar = surface.create_entity({name = 'spice-radar', position = character.position, force = character.force})
 			players_table[player_index].radar.destroy()
@@ -125,24 +118,6 @@ function player_moved(event)
 end
 
 function draw_spice_overlay(player)
-	--[[
-	rendering.draw_rectangle({
-		color = {r = 0.04, g = 0.18, b = 0.66, a = 0.01},
-		left_top = {
-			player.character.position.x - 960,
-			player.character.position.y - 540
-		},
-		right_bottom = {
-			player.character.position.x + 960,
-			player.character.position.y + 540
-		},
-		filled = true,
-		target = player.character,
-		surface = player.surface,
-		time_to_live = SPICE_DURATION,
-		player = {player}
-	})
-	--]]
 	rendering.draw_sprite({
 		sprite = 'item.spice-overlay',
 		x_scale = 160,
@@ -183,14 +158,17 @@ lib.on_nth_tick = {
 
 lib.on_init = function()
 	players_table = global.players
+	spice_effects_blacklist = global.spice_effects_blacklist
 end
 
 lib.on_configuration_changed = function()
 	players_table = global.players
+	spice_effects_blacklist = global.spice_effects_blacklist
 end
 
 lib.on_load = function ()
 	players_table = global.players
+	spice_effects_blacklist = global.spice_effects_blacklist
 end
 
 return lib

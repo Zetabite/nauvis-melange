@@ -7,6 +7,23 @@ remote.add_interface('nauvis_melange_interface', {
 	end,
 	spice_for_victory_count = function()
 		return 10000
+	end,
+	spice_effects_blacklist_init_values = function()
+		return {
+			type = {
+				['locomotive'] = true,
+				['artillery-wagon'] = true,
+				['cargo-wagon'] = true,
+				['fluid-wagon'] = true
+			},
+			name = {}
+		}
+	end,
+	add_to_spice_effects_blacklist = function(key, value)
+		table.insert(global.spice_effects_blacklist[key], value)
+	end,
+	remove_from_spice_effects_blacklist = function(key, value)
+		table.remove(global.spice_effects_blacklist[key], value)
 	end
 })
 
@@ -151,6 +168,11 @@ function competitor_spice_table_init()
 	end
 end
 
+-- Spice effects blacklist
+function spice_effects_blacklist_init()
+	global.spice_effects_blacklist = remote.call('nauvis_melange_interface', 'spice_effects_blacklist_init_values')
+end
+
 -- lib
 local lib = {}
 
@@ -159,6 +181,7 @@ lib.on_init = function()
 	aliens_table_init()
 	competitor_spice_table_init()
 	forces_table_init()
+	spice_effects_blacklist_init()
 end
 
 lib.on_configuration_changed = function()
@@ -166,6 +189,7 @@ lib.on_configuration_changed = function()
 	aliens_table_init()
 	competitor_spice_table_init()
 	forces_table_configuration_changed()
+	spice_effects_blacklist_init()
 end
 
 return lib
