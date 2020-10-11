@@ -23,7 +23,7 @@ function created_entity(event)
 		local position = entity.position
 		local radius = 5
 		local alien = surface.find_entities_filtered({type = 'unit', position = position, radius = radius, force = 'enemy', limit = 1})
-		if (alien) then
+		if alien[1] then
 			alien = alien[1]
 			local sample = nil
 			if aliens_table.reverse['biter'][alien.name] then
