@@ -13,6 +13,7 @@ function apply_spice_to_vehicle(player)
 			if not has_spice_effects(vehicle) then
 				local surface = vehicle.surface
 				local position = vehicle.position
+				surface.create_entity({ name = 'spice-applied-sticker', target = vehicle, position = position })
 				surface.create_entity({ name = 'spice-speed-sticker', target = vehicle, position = position })
 				surface.create_entity({ name = 'spice-vehicle-regen-sticker', target = vehicle, position = position })
 			end
@@ -28,7 +29,7 @@ end
 function has_spice_effects(entity)
 	if (entity.stickers) then
 		for _, sticker in pairs(entity.stickers) do
-			if string.match(sticker.name, 'spice') then
+			if sticker.name == 'spice-applied-sticker' then
 				return true
 			end
 		end
@@ -50,10 +51,10 @@ end
 
 --[[
 -- pre_consumption: in case an initial amount or so was needed that should not be added to the calculation
--- consequence:	'bad_trip': bad_trip should be applied
-				'no_consumption': all items should be returned to the inventory if not enough (includes pre_consumed)
-				'no_further_consumption': the pre consumed items are not returned
-				'nil': proceeds as if enough spice is avaible
+-- consequence:	'bad_trip': bad_trip should be applied and items are consumed
+				'no_consumption': no item is consumed
+				'no_effect': nothings happens, but the items are consumed
+				'nil': proceeds without checking and removes items
 --]]
 function consume_spice(player_index, factor, consequence, pre_consumed)
 	local player = game.get_player(player_index)
@@ -61,39 +62,38 @@ function consume_spice(player_index, factor, consequence, pre_consumed)
 	local addiction_level = players_table[player_index].addiction_level
 	local inventory = character.get_main_inventory()
 	local needed = ((1 + addiction_level * addiction_level) * factor)
-	if pre_consumed then
+	if pre_consumed and pre_consumed > 0 then
 		needed = needed - pre_consumed
 	end
 	if needed > 0 then
 		local item = {name = 'spice', count = needed}
-		local actual = inventory.remove(item)
-		if actual < needed and consequence then
-			-- Consequences
-			if consequence == 'bad_trip' then
-				players_table[player_index].bad_trip.active = true
-				players_table[player_index].bad_trip.remaining_ticks = SPICE_DURATION
-				if not settings.global['Kux-Running_Enable'].value then
-					local speed_modifier = player.character_running_speed_modifier
-					player.character_running_speed_modifier = speed_modifier * 0.8
+		if consequence then
+			local actual = inventory.get_item_count('spice')
+			if actual < needed then
+				-- Consequences
+				if consequence == 'no_effect' or consequence == 'bad_trip' then
+					inventory.remove(item)
+					if consequence == 'bad_trip' then
+						players_table[player_index].bad_trip.active = true
+						players_table[player_index].bad_trip.remaining_ticks = SPICE_DURATION
+						if not settings.global['Kux-Running_Enable'].value then
+							local speed_modifier = player.character_running_speed_modifier
+							player.character_running_speed_modifier = speed_modifier * 0.8
+						end
+						character.damage(50 * (needed - actual), 'enemy')
+					end
+				elseif consequence == 'no_consumption' then
+					if pre_consumed > 0 then
+						item = {name = 'spice', count = pre_consumed}
+						inventory.insert(item)
+					end
 				end
-				character.damage(50 * (needed - actual), 'enemy')
-			elseif consequence == 'no_consumption' or consequence == 'no_further_consumption' then
-				if consequence == 'no_consumption' and pre_consumed then
-					actual = actual + pre_consumed
-				end
-				item = {name = 'spice', count = actual}
-				actual = inventory.insert(item)
-				if actual > 0 then
-					item = {name = 'spice', count = actual}
-					local surface = character.surface
-					local position = character.position
-					surface.spill_item_stack({position = position, items = item, enable_looted = false, force = 'neutral'})
-				end
+				return false
 			end
-			return false
 		end
+		inventory.remove(item)
 	end
-	if not has_spice_effects(player.character) then
+	if not has_spice_effects(character) then
 		apply_spice_to_player(player)
 	end
 	return true
@@ -101,19 +101,23 @@ end
 
 function apply_spice_to_player(player)
 	local character = player.character
-	local surface = player.surface
-	local position = player.position
+	local surface = character.surface
+	local position = character.position
 	local addiction_level = players_table[player.index].addiction_level
 	players_table[player.index].addiction_level = addiction_level + 1
 	-- Create entities/effects
-	local radar = surface.create_entity({name = 'spice-radar', position = character.position, force = character.force})
-	surface.create_entity({ name = 'spice-speed-sticker', target = character, position = position })
+	local radar = surface.create_entity({name = 'spice-radar', position = position, force = character.force})
+	if not settings.global['Kux-Running_Enable'].value then
+		surface.create_entity({ name = 'spice-speed-sticker', target = character, position = position })
+	end
 	surface.create_entity({ name = 'spice-regen-sticker', target = character, position = position })
+	surface.create_entity({ name = 'spice-applied-sticker', target = character, position = position })
 	players_table[player.index].radar.reference = radar
 	local craft_modifier = player.character_crafting_speed_modifier
 	player.character_crafting_speed_modifier = craft_modifier + 2
 	craft_modifier = player.character_crafting_speed_modifier
 	-- Table changes
+	players_table[player.index].under_influence = true
 	players_table[player.index].radar.active = true
 	players_table[player.index].craft_mod.active = true
 	players_table[player.index].radar.remaining_ticks = SPICE_COOLDOWN
@@ -192,6 +196,7 @@ function remove_spice_effects()
 				if render_table.spice_overlay[player_index] then
 					table.remove(render_table.spice_overlay, player_index)
 				end
+				players_table[player.index].under_influence = false
 			end
 		end
 	end
@@ -203,9 +208,11 @@ function player_moved(event)
 	if (player.character) then
 		local character = player.character
 		if has_spice_effects(character) then
-			local surface = player.surface
+			local surface = character.surface
 			local radar = surface.create_entity({name = 'spice-radar', position = character.position, force = character.force})
-			players_table[player_index].radar.reference.destroy()
+			if players_table[player_index].radar.reference then
+				players_table[player_index].radar.reference.destroy()
+			end
 			players_table[player_index].radar.reference = radar
 		end
 	end

@@ -3,6 +3,7 @@ remote.add_interface('nauvis_melange_table_defaults', {
 		return {
 			addiction_level = 0,
 			zoom_factor = global.ZOOM_FACTOR,
+			under_influence = false,
 			radar = {
 				active = false,
 				reference = false,
