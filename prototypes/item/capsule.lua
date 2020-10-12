@@ -1,3 +1,6 @@
+local config = require('scripts.config')
+local SPICE_COOLDOWN = config.SPICE_COOLDOWN
+
 data:extend({
 	{
 		type = 'capsule',
@@ -9,7 +12,7 @@ data:extend({
 			attack_parameters = {
 				type = 'projectile',
 				ammo_category = 'capsule',
-				cooldown = 60 * 300,
+				cooldown = SPICE_COOLDOWN,
 				range = 0,
 				sound = {
 					{
@@ -29,14 +32,6 @@ data:extend({
 									{
 										type = 'damage',
 										damage = {type = 'physical', amount = -50}
-									},
-									{
-										type = 'create-sticker',
-										sticker = 'spice-speed-sticker'
-									},
-									{
-										type = 'create-sticker',
-										sticker = 'spice-regen-sticker'
 									},
 									{
 										type = 'play-sound',

@@ -1,12 +1,12 @@
 local handler = require('event_handler')
 
-handler.add_lib(require('scripts.main.setup'))
-handler.add_lib(require('scripts.main.aliens'))
-handler.add_lib(require('scripts.main.machines'))
-handler.add_lib(require('scripts.main.players'))
-handler.add_lib(require('scripts.main.resources'))
-handler.add_lib(require('scripts.main.forces'))
+handler.add_lib(require('scripts.control.setup'))
+handler.add_lib(require('scripts.control.aliens'))
+handler.add_lib(require('scripts.control.machines'))
+handler.add_lib(require('scripts.control.players'))
+handler.add_lib(require('scripts.control.resources'))
+handler.add_lib(require('scripts.control.forces'))
 
 if script.active_mods['informatron'] then
-	require('scripts.informatron.informatron')
+	require('scripts.informatron.control')
 end

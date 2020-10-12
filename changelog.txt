@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.1
+Date: 12.10.2020
+  Features:
+    - Some interfaces for modders usage
+  Changes:
+    - Compatibility and usage of Kux-Running when in mods
+    - Compatibility with Kux-Zooming
+    - Code refactoring
+
+---------------------------------------------------------------------------------------------------
 Version: 0.8.0
 Date: 12.10.2020
   Features:

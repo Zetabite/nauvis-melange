@@ -2,6 +2,7 @@ remote.add_interface('nauvis_melange_table_defaults', {
 	players_default = function()
 		return {
 			addiction_level = 0,
+			zoom_factor = global.ZOOM_FACTOR,
 			radar = {
 				active = false,
 				reference = false,
@@ -19,6 +20,11 @@ remote.add_interface('nauvis_melange_table_defaults', {
 	end,
 	forces_default = function()
 		return {spice_shipped = 0}
+	end,
+	render_default = function()
+		return {
+			spice_overlay = {}
+		}
 	end,
 	spice_effects_blacklist_default = function()
 		return {
@@ -42,6 +48,15 @@ remote.add_interface('nauvis_melange_constants', {
 	end,
 	SPICE_DURATION = function()
 		return global.SPICE_DURATION
+	end,
+	OVERLAY_REFRESH = function()
+		return global.OVERLAY_REFRESH
+	end,
+	ZOOM_FACTOR = function()
+		return global.ZOOM_FACTOR
+	end,
+	OVERLAY_TIMER = function()
+		return global.OVERLAY_TIMER
 	end
 })
 
@@ -54,6 +69,22 @@ remote.add_interface('nauvis_melange_functions', {
 		table.remove(global.spice_effects_blacklist[key], value)
 	end
 })
+
+remote.add_interface('nauvis_melange_player', {
+	consume_spice = function(player_index, factor, consequence, pre_consumption)
+		return consume_spice(player_index, factor, consequence, pre_consumption)
+	end,
+	onZoomFactorChanged = function(event)
+		if global.zoom_table[event.playerIndex] then
+			global.zoom_table[event.playerIndex] = event.zoomFactor
+		end
+	end
+})
+
+-- Render table
+function render_table_init()
+	global.render_table = remote.call('nauvis_melange_table_defaults', 'render_default')
+end
 
 -- Player table
 function players_table_init()
@@ -228,6 +259,7 @@ lib.on_init = function()
 	competitor_spice_table_init()
 	forces_table_init()
 	spice_effects_blacklist_init()
+	render_table_init()
 end
 
 lib.on_configuration_changed = function()
@@ -236,6 +268,7 @@ lib.on_configuration_changed = function()
 	competitor_spice_table_init()
 	forces_table_configuration_changed()
 	spice_effects_blacklist_init()
+	render_table_init()
 end
 
 return lib
