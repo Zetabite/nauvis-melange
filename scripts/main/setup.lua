@@ -1,14 +1,26 @@
-remote.add_interface('nauvis_melange_interface', {
-	players_init_values = function()
-		return {counter = 0,radar = false,radar_tick = 0}
+remote.add_interface('nauvis_melange_table_defaults', {
+	players_default = function()
+		return {
+			addiction_level = 0,
+			radar = {
+				active = false,
+				reference = false,
+				remaining_ticks = 0,
+			},
+			craft_mod = {
+				active = false,
+				remaining_ticks = 0,
+			},
+			bad_trip = {
+				active = false,
+				remaining_ticks = 0,
+			}
+		}
 	end,
-	forces_init_values = function()
+	forces_default = function()
 		return {spice_shipped = 0}
 	end,
-	spice_for_victory_count = function()
-		return 10000
-	end,
-	spice_effects_blacklist_init_values = function()
+	spice_effects_blacklist_default = function()
 		return {
 			type = {
 				['locomotive'] = true,
@@ -18,7 +30,23 @@ remote.add_interface('nauvis_melange_interface', {
 			},
 			name = {}
 		}
+	end
+})
+
+remote.add_interface('nauvis_melange_constants', {
+	VICTORY_SPICE_AMOUNT = function()
+		return global.VICTORY_SPICE_AMOUNT
 	end,
+	SPICE_COOLDOWN = function()
+		return global.SPICE_COOLDOWN
+	end,
+	SPICE_DURATION = function()
+		return global.SPICE_DURATION
+	end
+})
+
+-- Mostly for modders usage
+remote.add_interface('nauvis_melange_functions', {
 	add_to_spice_effects_blacklist = function(key, value)
 		table.insert(global.spice_effects_blacklist[key], value)
 	end,
@@ -31,17 +59,18 @@ remote.add_interface('nauvis_melange_interface', {
 function players_table_init()
 	global.players = {}
 	for _, player in pairs(game.connected_players) do
-		global.players[player.index] = remote.call('nauvis_melange_interface', 'forces_init_values')
+		global.players[player.index] = remote.call('nauvis_melange_table_defaults', 'forces_default')
 	end
 end
 
 function players_table_configuration_changed()
+	-- For older version
 	if global.addiction_system then
 		players_table_init()
 		local players = {}
 		for player_name, entry in pairs(global.addiction_system) do
 			if #entry <= 0 then
-				for subkey, value in pairs(remote.call('nauvis_melange_interface', 'players_init_values')) do
+				for subkey, value in pairs(remote.call('nauvis_melange_table_defaults', 'players_default')) do
 					if not entry[subkey] then
 						entry[subkey] = value
 					end
@@ -52,17 +81,34 @@ function players_table_configuration_changed()
 		end
 		global.players = players
 	end
+	-- For current version
 	if global.players then
 		local players = {}
-		for player_index, entry in pairs(global.players) do
-			if #entry <= 0 then
-				for subkey, value in pairs(remote.call('nauvis_melange_interface', 'players_init_values')) do
-					if not entry[subkey] then
-						entry[subkey] = value
+		for _, entry in pairs(global.players) do
+			for subkey, value in pairs(remote.call('nauvis_melange_table_defaults', 'players_default')) do
+				if not entry[subkey] then
+					entry[subkey] = value
+				else
+					if subkey == 'radar' and type(entry['radar']) ~= 'table' then
+						local radar_reference = entry['radar']
+						local remaining_ticks = entry['radar_tick']
+						entry['radar'] = {
+							active = false,
+							reference = false,
+							remaining_ticks = 0,
+						}
+						if radar_reference then
+							entry['radar'].active = true
+							entry['radar'].reference = radar_reference
+							entry['radar'].remaining_ticks = remaining_ticks
+						end
+						table.remove(entry, 'radar_tick')
+					elseif subkey == 'counter' then
+						entry['addiction_level'] = entry['counter']
+						table.remove(entry, 'counter')
 					end
 				end
 			end
-			players[player_index] = entry
 		end
 		global.players = players
 	else
@@ -74,7 +120,7 @@ end
 function forces_table_init()
 	global.forces = {}
 	for _, force in pairs(game.forces) do
-		global.forces[force.index] = remote.call('nauvis_melange_interface', 'forces_init_values')
+		global.forces[force.index] = remote.call('nauvis_melange_table_defaults', 'forces_default')
 	end
 end
 
@@ -83,7 +129,7 @@ function forces_table_configuration_changed()
 		local forces = {}
 		for force_index, entry in pairs(global.forces) do
 			if #entry <= 0 then
-				for subkey, value in pairs(remote.call('nauvis_melange_interface', 'forces_init_values')) do
+				for subkey, value in pairs(remote.call('nauvis_melange_table_defaults', 'forces_default')) do
 					if not entry[subkey] then
 						entry[subkey] = value
 					end
@@ -170,7 +216,7 @@ end
 
 -- Spice effects blacklist
 function spice_effects_blacklist_init()
-	global.spice_effects_blacklist = remote.call('nauvis_melange_interface', 'spice_effects_blacklist_init_values')
+	global.spice_effects_blacklist = remote.call('nauvis_melange_table_defaults', 'spice_effects_blacklist_default')
 end
 
 -- lib

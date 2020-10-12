@@ -1,9 +1,9 @@
-local forces_table
-local competitor_spice_table
+local forces_table, competitor_spice_table
+local VICTORY_SPICE_AMOUNT = 10000
 
 function force_created(event)
 	local force_index = event.force.index
-	forces_table[force_index] = remote.call('nauvis_melange_interface', 'forces_init_values')
+	forces_table[force_index] = remote.call('nauvis_melange_table_defaults', 'forces_default')
 end
 
 function forces_merged(event)
@@ -16,12 +16,12 @@ function forces_merged(event)
 end
 
 function force_reset(event)
-	forces_table[event.force.index] = remote.call('nauvis_melange_interface', 'forces_init_values')
+	forces_table[event.force.index] = remote.call('nauvis_melange_table_defaults', 'forces_default')
 end
 
 function checkSpiceVictory()
 	for force_index, entry in pairs(forces_table) do
-		if entry.spice_shipped >= remote.call('nauvis_melange_interface', 'spice_for_victory_count') then
+		if entry.spice_shipped >= VICTORY_SPICE_AMOUNT then
 			if remote.interfaces['kr-intergalactic-transceiver'] and remote.interfaces['kr-intergalactic-transceiver']['set_no_victory'] then
 				remote.call('kr-intergalactic-transceiver', 'set_no_victory', true)
 			else
@@ -57,16 +57,19 @@ lib.on_nth_tick = {
 lib.on_init = function()
 	forces_table = global.forces
 	competitor_spice_table = global.competitor_spice
+	global.VICTORY_SPICE_AMOUNT = VICTORY_SPICE_AMOUNT
 end
 
 lib.on_configuration_changed = function()
 	forces_table = global.forces
 	competitor_spice_table = global.competitor_spice
+	global.VICTORY_SPICE_AMOUNT = VICTORY_SPICE_AMOUNT
 end
 
 lib.on_load = function ()
 	forces_table = global.forces
 	competitor_spice_table = global.competitor_spice
+	global.VICTORY_SPICE_AMOUNT = VICTORY_SPICE_AMOUNT
 end
 
 return lib
