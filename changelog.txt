@@ -1,9 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.3
+Date: 13.10.2020
+  Changes:
+    - Added default values in config.lua
+  Bugfixes:
+    - Fixed player table being empty in existing save after version change
+
+---------------------------------------------------------------------------------------------------
 Version: 0.8.2
 Date: 13.10.2020
+  Changes:
+    - Made constants only load as local
   Bugfixes:
     - Fixed on_load() crash due to global manipulation
-    - Made constants only load as local
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.8.1

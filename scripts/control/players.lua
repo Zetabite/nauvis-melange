@@ -5,6 +5,17 @@ local SPICE_COOLDOWN = config.SPICE_COOLDOWN
 local OVERLAY_REFRESH = config.OVERLAY_REFRESH
 local OVERLAY_TIMER = config.OVERLAY_TIMER
 
+remote.add_interface('nauvis_melange_player', {
+	consume_spice = function(player_index, factor, consequence, pre_consumption)
+		return consume_spice(player_index, factor, consequence, pre_consumption)
+	end,
+	onZoomFactorChanged = function(event)
+		if global.zoom_table[event.playerIndex] then
+			global.zoom_table[event.playerIndex] = event.zoomFactor
+		end
+	end
+})
+
 function apply_spice_to_vehicle(player)
 	if (player.vehicle) then
 		local vehicle = player.vehicle
@@ -53,7 +64,7 @@ end
 -- consequence:	'bad_trip': bad_trip should be applied and items are consumed
 				'no_consumption': no item is consumed
 				'no_effect': nothings happens, but the items are consumed
-				'nil': proceeds without checking and removes items
+				'nil': proceeds without checking if enough items exist and removes items
 --]]
 function consume_spice(player_index, factor, consequence, pre_consumed)
 	local player = game.get_player(player_index)
@@ -128,7 +139,7 @@ end
 function player_joined(event)
 	local player_index = event.player_index
 	if not (players_table[player_index]) then
-		players_table[player_index] = remote.call('nauvis_melange_table_defaults', 'players_default')
+		players_table[player_index] = config.players_default
 	end
 end
 
@@ -137,7 +148,7 @@ function player_died(event)
 	if players_table[player_index].radar.reference then
 		players_table[player_index].radar.reference.destroy()
 	end
-	players_table[player_index] = remote.call('nauvis_melange_table_defaults', 'players_default')
+	players_table[player_index] = config.players_default
 	if render_table.spice_overlay[player_index] then
 		table.remove(render_table.spice_overlay, player_index)
 	end
@@ -145,11 +156,10 @@ end
 
 function remove_addiction()
 	for _, player in pairs(game.connected_players) do
-		local player_index = player.index
 		if player.character then
-			local addiction_level = players_table[player_index].addiction_level
+			local addiction_level = players_table[player.index].addiction_level
 			if math.random(0, 100) > 75 and addiction_level > 0 then
-				players_table[player_index].addiction_level = addiction_level - 1
+				players_table[player.index].addiction_level = addiction_level - 1
 			end
 		end
 	end
@@ -241,6 +251,22 @@ function overlay_refresh()
 	end
 end
 
+-- Util stuff
+
+function load_globals()
+	players_table = global.players
+	spice_effects_blacklist = global.spice_effects_blacklist
+	render_table = global.render_table
+end
+
+function check_and_call_kux_zooming()
+	if script.active_mods['Kux-Zooming'] then
+		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
+			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
+		end
+	end
+end
+
 -- lib
 local lib = {}
 
@@ -255,39 +281,18 @@ lib.events = {
 }
 
 lib.on_init = function()
-	players_table = global.players
-	spice_effects_blacklist = global.spice_effects_blacklist
-	render_table = global.render_table
-
-	if script.active_mods['Kux-Zooming'] then
-		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
-			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
-		end
-	end
+	load_globals()
+	check_and_call_kux_zooming()
 end
 
 lib.on_configuration_changed = function()
-	players_table = global.players
-	spice_effects_blacklist = global.spice_effects_blacklist
-	render_table = global.render_table
-
-	if script.active_mods['Kux-Zooming'] then
-		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
-			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
-		end
-	end
+	load_globals()
+	check_and_call_kux_zooming()
 end
 
 lib.on_load = function ()
-	players_table = global.players
-	spice_effects_blacklist = global.spice_effects_blacklist
-	render_table = global.render_table
-
-	if script.active_mods['Kux-Zooming'] then
-		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
-			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
-		end
-	end
+	load_globals()
+	check_and_call_kux_zooming()
 end
 
 lib.on_nth_tick = {

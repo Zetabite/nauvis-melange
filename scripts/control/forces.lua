@@ -4,7 +4,7 @@ local VICTORY_SPICE_AMOUNT = config.VICTORY_SPICE_AMOUNT
 
 function force_created(event)
 	local force_index = event.force.index
-	forces_table[force_index] = remote.call('nauvis_melange_table_defaults', 'forces_default')
+	forces_table[force_index] = config.forces_default
 end
 
 function forces_merged(event)
@@ -17,7 +17,7 @@ function forces_merged(event)
 end
 
 function force_reset(event)
-	forces_table[event.force.index] = remote.call('nauvis_melange_table_defaults', 'forces_default')
+	forces_table[event.force.index] = config.forces_default
 end
 
 function checkSpiceVictory()
