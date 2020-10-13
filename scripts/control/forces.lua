@@ -1,5 +1,6 @@
 local forces_table, competitor_spice_table
-local VICTORY_SPICE_AMOUNT = 10000
+local config = require('scripts.config')
+local VICTORY_SPICE_AMOUNT = config.VICTORY_SPICE_AMOUNT
 
 function force_created(event)
 	local force_index = event.force.index
@@ -57,19 +58,16 @@ lib.on_nth_tick = {
 lib.on_init = function()
 	forces_table = global.forces
 	competitor_spice_table = global.competitor_spice
-	global.VICTORY_SPICE_AMOUNT = VICTORY_SPICE_AMOUNT
 end
 
 lib.on_configuration_changed = function()
 	forces_table = global.forces
 	competitor_spice_table = global.competitor_spice
-	global.VICTORY_SPICE_AMOUNT = VICTORY_SPICE_AMOUNT
 end
 
 lib.on_load = function ()
 	forces_table = global.forces
 	competitor_spice_table = global.competitor_spice
-	global.VICTORY_SPICE_AMOUNT = VICTORY_SPICE_AMOUNT
 end
 
 return lib

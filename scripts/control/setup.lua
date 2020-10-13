@@ -1,3 +1,5 @@
+local config = require('scripts.config')
+
 remote.add_interface('nauvis_melange_table_defaults', {
 	players_default = function()
 		return {
@@ -42,22 +44,22 @@ remote.add_interface('nauvis_melange_table_defaults', {
 
 remote.add_interface('nauvis_melange_constants', {
 	VICTORY_SPICE_AMOUNT = function()
-		return global.VICTORY_SPICE_AMOUNT
+		return config.VICTORY_SPICE_AMOUNT
 	end,
 	SPICE_COOLDOWN = function()
-		return global.SPICE_COOLDOWN
+		return config.SPICE_COOLDOWN
 	end,
 	SPICE_DURATION = function()
-		return global.SPICE_DURATION
+		return config.SPICE_DURATION
 	end,
 	OVERLAY_REFRESH = function()
-		return global.OVERLAY_REFRESH
+		return config.OVERLAY_REFRESH
 	end,
 	ZOOM_FACTOR = function()
-		return global.ZOOM_FACTOR
+		return config.ZOOM_FACTOR
 	end,
 	OVERLAY_TIMER = function()
-		return global.OVERLAY_TIMER
+		return config.OVERLAY_TIMER
 	end
 })
 

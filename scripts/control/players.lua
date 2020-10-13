@@ -4,7 +4,6 @@ local SPICE_DURATION = config.SPICE_DURATION
 local SPICE_COOLDOWN = config.SPICE_COOLDOWN
 local OVERLAY_REFRESH = config.OVERLAY_REFRESH
 local OVERLAY_TIMER = config.OVERLAY_TIMER
-local ZOOM_FACTOR = config.ZOOM_FACTOR
 
 function apply_spice_to_vehicle(player)
 	if (player.vehicle) then
@@ -236,27 +235,9 @@ function overlay_refresh()
 			tint = {r = 0.04, g = 0.18, b = 0.66},
 			target = player.character,
 			surface = player.surface,
-			time_to_live = OVERLAY_REFRESH + 1,
+			time_to_live = OVERLAY_TIMER,
 			player = {player}
 		})
-	end
-end
-
-function load()
-	players_table = global.players
-	spice_effects_blacklist = global.spice_effects_blacklist
-	render_table = global.render_table
-
-	global.SPICE_COOLDOWN = SPICE_COOLDOWN
-	global.SPICE_DURATION = SPICE_DURATION
-	global.OVERLAY_REFRESH = OVERLAY_REFRESH
-	global.OVERLAY_TIMER = OVERLAY_TIMER
-	global.ZOOM_FACTOR = ZOOM_FACTOR
-
-	if script.active_mods['Kux-Zooming'] then
-		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
-			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
-		end
 	end
 end
 
@@ -274,15 +255,39 @@ lib.events = {
 }
 
 lib.on_init = function()
-	load()
+	players_table = global.players
+	spice_effects_blacklist = global.spice_effects_blacklist
+	render_table = global.render_table
+
+	if script.active_mods['Kux-Zooming'] then
+		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
+			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
+		end
+	end
 end
 
 lib.on_configuration_changed = function()
-	load()
+	players_table = global.players
+	spice_effects_blacklist = global.spice_effects_blacklist
+	render_table = global.render_table
+
+	if script.active_mods['Kux-Zooming'] then
+		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
+			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
+		end
+	end
 end
 
 lib.on_load = function ()
-	load()
+	players_table = global.players
+	spice_effects_blacklist = global.spice_effects_blacklist
+	render_table = global.render_table
+
+	if script.active_mods['Kux-Zooming'] then
+		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
+			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
+		end
+	end
 end
 
 lib.on_nth_tick = {
