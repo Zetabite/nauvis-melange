@@ -10,105 +10,26 @@ remote.add_interface('nauvis_melange_functions', {
 	end
 })
 
--- Render table
-function render_table_init()
-	global.render_table = config.render_default
-end
-
--- Player table
-function players_table_init()
-	global.players = {}
-	for _, player in pairs(game.connected_players) do
-		global.players[player.index] = config.forces_default
-	end
-end
-
-function players_table_configuration_changed()
-	-- For older version
-	if global.addiction_system then
-		players_table_init()
-		local players = {}
-		for player_name, entry in pairs(global.addiction_system) do
-			if #entry <= 0 then
-				for subkey, value in pairs(config.players_default) do
-					if not entry[subkey] then
-						entry[subkey] = value
-					end
-				end
-			end
-			local player_index = game.get_player(player_name).index
-			players[player_index] = entry
+-- Inits
+init = {
+	players = function()
+		global.players = {}
+		for _, player in pairs(game.connected_players) do
+			global.players[player.index] = config.default.players
 		end
-		global.players = players
-	end
-	-- For current version
-	if global.players then
-		local players = {}
-		for player_index, entry in pairs(global.players) do
-			players[player_index] = {}
-			for subkey, value in pairs(config.players_default) do
-				if not entry[subkey] then
-					entry[subkey] = value
-				else
-					if subkey == 'radar' and type(entry['radar']) ~= 'table' then
-						local radar_reference = entry['radar']
-						local remaining_ticks = entry['radar_tick']
-						entry['radar'] = {
-							active = false,
-							reference = false,
-							remaining_ticks = 0,
-						}
-						if radar_reference then
-							entry['radar'] = {}
-							entry['radar'].active = true
-							entry['radar'].reference = radar_reference
-							entry['radar'].remaining_ticks = remaining_ticks
-						end
-						table.remove(entry, 'radar_tick')
-					elseif subkey == 'counter' then
-						entry['addiction_level'] = entry['counter']
-						table.remove(entry, 'counter')
-					end
-				end
-			end
-			players[player_index] = entry
+	end,
+
+	-- Forces table for winning condition
+	forces = function()
+		global.forces = {}
+		for _, force in pairs(game.forces) do
+			global.forces[force.index] = config.default.forces
 		end
-		global.players = players
-	else
-		players_table_init()
-	end
-end
+	end,
 
--- Forces table for winning condition
-function forces_table_init()
-	global.forces = {}
-	for _, force in pairs(game.forces) do
-		global.forces[force.index] = config.forces_default
-	end
-end
-
-function forces_table_configuration_changed()
-	if global.forces then
-		local forces = {}
-		for force_index, entry in pairs(global.forces) do
-			if #entry <= 0 then
-				for subkey, value in pairs(config.forces_default) do
-					if not entry[subkey] then
-						entry[subkey] = value
-					end
-				end
-			end
-			forces[force_index] = entry
-		end
-		global.forces = forces
-	else
-		forces_table_init()
-	end
-end
-
--- Aliens Table
-function aliens_table_init()
-	global.aliens = {}
+	-- Aliens Table
+	aliens = function()
+		global.aliens = {}
 	-- Creating enums from mods
 	local enum_aliens = {
 		['biter'] = {},
@@ -159,48 +80,99 @@ function aliens_table_init()
 		enum_aliens_reverse[type_name] = reverse
 	end
 
+	global.aliens.dict = enum_aliens
 	global.aliens.names = enum_alien_names
 	global.aliens.collector = enum_alien_collector
 	global.aliens.melee = enum_alien_melee
 	global.aliens.reverse = enum_aliens_reverse
-end
-
--- Competitor spice table
-function competitor_spice_table_init()
-	global.competitor_spice = {}
-	if script.active_mods['space-exploration'] then
-		local spice_name = 'se-vitamelange'
-		local spice_suffix = { '', '-spice', '-nugget', '-roast', '-extract'}
-		for _, suffix in pairs(spice_suffix) do
-			table.insert(global.competitor_spice, (spice_name..suffix))
+	end,
+	competitor_spice = function()
+		global.competitor_spice = {}
+		if script.active_mods['space-exploration'] then
+			local spice_name = 'se-vitamelange'
+			local spice_suffix = { '', '-spice', '-nugget', '-roast', '-extract'}
+			for _, suffix in pairs(spice_suffix) do
+				table.insert(global.competitor_spice, (spice_name..suffix))
+			end
 		end
 	end
-end
+}
 
--- Spice effects blacklist
-function spice_effects_blacklist_init()
-	global.spice_effects_blacklist = config.spice_effects_blacklist_default
-end
+-- Inits
+configuration_changed = {
+	players = function()
+		-- Change for next version in case of change
+		local players_table = global.players
+		if players_table then
+			for player_index,_ in pairs(players_table) do
+				local default = config.default.players
+				if players_table[player_index].under_influence ~= nil then
+					players_table[player_index] = default
+				else
+					for key, entry in pairs(default) do
+						if not players_table[player_index][key] then
+							players_table[player_index][key] = entry
+						end
+						if type(default[key]) == 'table' then
+							for subkey, subentry in pairs(default[key]) do
+								if not entry[subkey] then
+									entry[subkey] = subentry
+								end
+							end
+						end
+					end
+				end
+			end
+		else
+			init.players()
+		end
+	end,
+	-- Forces table for winning condition
+	forces = function()
+		if global.forces then
+			local forces = {}
+			for force_index, entry in pairs(global.forces) do
+				if #entry <= 0 then
+					for subkey, value in pairs(config.default.forces) do
+						if not entry[subkey] then
+							entry[subkey] = value
+						end
+					end
+				end
+				forces[force_index] = entry
+			end
+			global.forces = forces
+		else
+			init.forces()
+		end
+	end,
+	aliens = function()
+		init.aliens()
+	end,
+	competitor_spice = function()
+		init.competitor_spice()
+	end
+}
 
 -- lib
 local lib = {}
 
 lib.on_init = function()
-	players_table_init()
-	aliens_table_init()
-	competitor_spice_table_init()
-	forces_table_init()
-	spice_effects_blacklist_init()
-	render_table_init()
+	global.render_table = config.default.render
+	global.spice_effects_blacklist = config.default.spice_effects_blacklist
+	init.aliens()
+	init.players()
+	init.forces()
+	init.competitor_spice()
 end
 
 lib.on_configuration_changed = function()
-	players_table_configuration_changed()
-	aliens_table_init()
-	competitor_spice_table_init()
-	forces_table_configuration_changed()
-	spice_effects_blacklist_init()
-	render_table_init()
+	global.render_table = global.render_table or config.default.render
+	global.spice_effects_blacklist = global.spice_effects_blacklist or config.default.spice_effects_blacklist
+	configuration_changed.aliens()
+	configuration_changed.players()
+	configuration_changed.forces()
+	configuration_changed.competitor_spice()
 end
 
 return lib

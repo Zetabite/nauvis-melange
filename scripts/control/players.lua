@@ -1,25 +1,78 @@
-local players_table, spice_effects_blacklist, render_table
 local config = require('scripts.config')
-local SPICE_DURATION = config.SPICE_DURATION
-local SPICE_COOLDOWN = config.SPICE_COOLDOWN
-local OVERLAY_REFRESH = config.OVERLAY_REFRESH
+
+local PLAYER_CHECK_TICK = config.PLAYER_CHECK_TICK
+local RENDER_REFRESH_TICK = config.RENDER_REFRESH_TICK
 local OVERLAY_TIMER = config.OVERLAY_TIMER
+local SPICE_DURATION = config.SPICE_DURATION
+local effect_table = config.effect_table
 
 remote.add_interface('nauvis_melange_player', {
 	consume_spice = function(player_index, factor, consequence, pre_consumption)
 		return consume_spice(player_index, factor, consequence, pre_consumption)
 	end,
 	onZoomFactorChanged = function(event)
-		if global.zoom_table[event.playerIndex] then
-			global.zoom_table[event.playerIndex] = event.zoomFactor
-		end
+		global.players[event.playerIndex].zoom_factor = event.zoomFactor
+	end,
+	spice_influence_changed_add = function(interface_name, function_name)
+		global.callbacks = global.callbacks or {}
+		global.callbacks.spice_influence_changed = global.callbacks.spice_influence_changed or {}
+
+		local id = interface_name..'-'..function_name
+		local entry = {
+			interface_name = interface_name,
+			function_name = function_name,
+		}
+		global.callbacks.spice_influence_changed[id] = entry
+	end,
+	spice_influence_changed_remove = function(interface_name, function_name)
+		global.callbacks = global.callbacks or {}
+		global.callbacks.spice_influence_changed = global.callbacks.spice_influence_changed or {}
+		local id = interface_name..'-'..function_name
+		global.callbacks.spice_influence_changed[id] = nil
+	end,
+	has_spice_influence = function(player_index)
+		return has_spice_influence(player_index)
 	end
 })
+
+function has_spice_influence(player_index)
+	local entry = global.players[player_index]
+	if entry.radar.tick or entry.craft_mod.tick then
+		return true
+	end
+	return false
+end
+
+function has_bad_trip(player_index)
+	if global.players[player_index].bad_trip.tick then
+		return true
+	end
+	return false
+end
+
+function spice_influence_changed_raise(player_index)
+	global.callbacks = global.callbacks or {}
+	global.callbacks.spice_effects_changed = global.callbacks.spice_effects_changed or {}
+	if has_spice_influence(player_index) then
+		game.get_player(player_index).print("Spice status: on")
+	else
+		game.get_player(player_index).print("Spice status: off")
+	end
+	local event = {
+		player_index = player_index,
+		on_spice = has_spice_influence(player_index)
+	}
+	for _, entry in pairs(global.callbacks.spice_effects_changed) do
+		if entry then
+			remote.call(entry.interface_name, entry.function_name, event)
+		end
+	end
+end
 
 function apply_spice_to_vehicle(player)
 	if (player.vehicle) then
 		local vehicle = player.vehicle
-		if vehicle.type == 'car' and not spice_effects_blacklist['name'][vehicle.name] then
+		if vehicle.type == 'car' and not global.spice_effects_blacklist['name'][vehicle.name] then
 			if not has_spice_effects(vehicle) then
 				local surface = vehicle.surface
 				local position = vehicle.position
@@ -36,21 +89,68 @@ function vehicle_interaction(event)
 	apply_spice_to_vehicle(player)
 end
 
-function has_spice_effects(entity)
-	if (entity.stickers) then
-		for _, sticker in pairs(entity.stickers) do
-			if sticker.name == 'spice-applied-sticker' then
-				return true
-			end
-		end
-	end
-	return false
-end
-
 -- This is where the spice effects for the player are applied
+local manage = {
+	radar = {
+		enable = function(player_index)
+			local player = game.get_player(player_index)
+			local radar = global.players[player_index].radar
+			local character = player.character
+			local surface = character.surface
+			local position = character.position
+			local reference = surface.create_entity({name = 'spice-radar', position = position, force = character.force})
+			radar.reference = reference
+			radar.tick = game.tick
+		end,
+		disable = function(player_index)
+			local radar = global.players[player_index].radar
+			if radar.reference then
+				radar.reference.destroy()
+			end
+			radar.reference = false
+			radar.tick = false
+		end,
+	},
+
+	craft_mod = {
+		enable = function(player_index)
+			local player = game.get_player(player_index)
+			local craft_modifier = player.character_crafting_speed_modifier
+			player.character_crafting_speed_modifier = craft_modifier + 2
+			craft_modifier = player.character_crafting_speed_modifier
+			global.players[player_index].craft_mod.tick = game.tick
+		end,
+		disable = function(player_index)
+			local player = game.get_player(player_index)
+			local craft_modifier = player.character_crafting_speed_modifier
+			player.character_crafting_speed_modifier = craft_modifier - 2
+			global.players[player_index].craft_mod.tick = false
+		end,
+	},
+
+	bad_trip = {
+		enable = function(player_index)
+			if not settings.global['Kux-Running_Enable'].value then
+				local player = game.get_player(player_index)
+				local speed_modifier = player.character_running_speed_modifier
+				player.character_running_speed_modifier = speed_modifier * 0.8
+			end
+			global.players[player_index].bad_trip.tick = game.tick
+		end,
+		disable = function(player_index)
+			if not settings.global['Kux-Running_Enable'].value then
+				local player = game.get_player(player_index)
+				local speed_modifier = player.character_running_speed_modifier
+				player.character_running_speed_modifier = speed_modifier * 0.5
+			end
+			global.players[player_index].bad_trip.tick = false
+		end
+	}
+}
+
 function used_capsule(event)
 	local capsule = event.item
-	if string.match(capsule.name, 'spice') then
+	if capsule.name == 'spice' then
 		local player_index = event.player_index
 		local player = game.get_player(player_index)
 		if (player.character) then
@@ -69,11 +169,14 @@ end
 function consume_spice(player_index, factor, consequence, pre_consumed)
 	local player = game.get_player(player_index)
 	local character = player.character
-	local addiction_level = players_table[player_index].addiction_level
+	local addiction_level = global.players[player_index].addiction_level
 	local inventory = character.get_main_inventory()
-	local needed = ((1 + addiction_level * addiction_level) * factor)
-	if pre_consumed and pre_consumed > 0 then
-		needed = needed - pre_consumed
+	local needed = 0
+	if factor > 0 then
+		needed = ((1 + addiction_level * addiction_level) * factor)
+		if pre_consumed and pre_consumed > 0 then
+			needed = needed - pre_consumed
+		end
 	end
 	if needed > 0 then
 		local item = {name = 'spice', count = needed}
@@ -84,12 +187,7 @@ function consume_spice(player_index, factor, consequence, pre_consumed)
 				if consequence == 'no_effect' or consequence == 'bad_trip' then
 					inventory.remove(item)
 					if consequence == 'bad_trip' then
-						players_table[player_index].bad_trip.active = true
-						players_table[player_index].bad_trip.remaining_ticks = SPICE_DURATION
-						if not settings.global['Kux-Running_Enable'].value then
-							local speed_modifier = player.character_running_speed_modifier
-							player.character_running_speed_modifier = speed_modifier * 0.8
-						end
+						manage.bad_trip.enable(player_index)
 						character.damage(50 * (needed - actual), 'enemy')
 					end
 				elseif consequence == 'no_consumption' then
@@ -103,110 +201,87 @@ function consume_spice(player_index, factor, consequence, pre_consumed)
 		end
 		inventory.remove(item)
 	end
-	if not has_spice_effects(character) then
+	if not has_spice_influence(player_index) then
 		apply_spice_to_player(player)
 	end
 	return true
 end
 
 function apply_spice_to_player(player)
+	local players_table = global.players
 	local character = player.character
 	local surface = character.surface
 	local position = character.position
-	local addiction_level = players_table[player.index].addiction_level
-	players_table[player.index].addiction_level = addiction_level + 1
+	local player_index = player.index
+	local addiction_level = players_table[player_index].addiction_level
+	players_table[player_index].addiction_level = addiction_level + 1
 	-- Create entities/effects
-	local radar = surface.create_entity({name = 'spice-radar', position = position, force = character.force})
 	if not settings.global['Kux-Running_Enable'].value then
 		surface.create_entity({ name = 'spice-speed-sticker', target = character, position = position })
 	end
 	surface.create_entity({ name = 'spice-regen-sticker', target = character, position = position })
-	surface.create_entity({ name = 'spice-applied-sticker', target = character, position = position })
-	players_table[player.index].radar.reference = radar
-	local craft_modifier = player.character_crafting_speed_modifier
-	player.character_crafting_speed_modifier = craft_modifier + 2
-	craft_modifier = player.character_crafting_speed_modifier
 	-- Table changes
-	players_table[player.index].under_influence = true
-	players_table[player.index].radar.active = true
-	players_table[player.index].craft_mod.active = true
-	players_table[player.index].radar.remaining_ticks = SPICE_COOLDOWN
-	players_table[player.index].craft_mod.remaining_ticks = SPICE_COOLDOWN
-	render_table.spice_overlay[player.index] = true
+	global.render_table.spice_overlay[player_index] = true
+	manage.radar.enable(player_index)
+	manage.craft_mod.enable(player_index)
 	apply_spice_to_vehicle(player)
+	spice_influence_changed_raise(player_index)
 end
 
 function player_joined(event)
+	local players_table = global.players
 	local player_index = event.player_index
-	if not (players_table[player_index]) then
-		players_table[player_index] = config.players_default
+	players_table[player_index] = players_table[player_index] or config.default.players
+	if has_spice_influence(player_index) then
+		global.render_table.spice_overlay[player_index] = true
 	end
 end
 
 function player_died(event)
 	local player_index = event.player_index
-	if players_table[player_index].radar.reference then
-		players_table[player_index].radar.reference.destroy()
-	end
-	players_table[player_index] = config.players_default
-	if render_table.spice_overlay[player_index] then
-		table.remove(render_table.spice_overlay, player_index)
-	end
+	try_to_remove_spice_effects(player_index, true)
 end
 
 function remove_addiction()
 	for _, player in pairs(game.connected_players) do
 		if player.character then
+			local players_table = global.players
 			local addiction_level = players_table[player.index].addiction_level
-			if math.random(0, 100) > 75 and addiction_level > 0 then
+			if addiction_level > 0 and math.random(0, 100) > 90 then
 				players_table[player.index].addiction_level = addiction_level - 1
 			end
 		end
 	end
 end
 
-function remove_spice_effects()
-	if (players_table) then
-		for player_index, entry in pairs(players_table) do
-			local player = game.get_player(player_index)
-			if player.character then
-				if entry.radar.reference then
-					if entry.radar.remaining_ticks > 0 then
-						entry.radar.remaining_ticks = entry.radar.remaining_ticks - SPICE_DURATION
-					end
-					if entry.radar.remaining_ticks <= 0 then
-						entry.radar.reference.destroy()
-						entry.radar.reference = false
-						entry.radar.active = false
-					end
+function try_to_remove_spice_effects(player_index, ignore)
+	local players_table = global.players or {}
+	local player = game.get_player(player_index)
+	if player.character or ignore then
+		local entry = players_table[player_index]
+		for _, key in pairs(effect_table) do
+			local value = entry[key]
+			if value.tick then
+				if value.tick <= (game.tick - value.duration) or ignore then
+					manage[key].disable(player_index)
 				end
-				if entry.craft_mod.active then
-					if entry.craft_mod.remaining_ticks > 0 then
-						entry.craft_mod.remaining_ticks = entry.craft_mod.remaining_ticks - SPICE_DURATION
-					end
-					if entry.craft_mod.remaining_ticks <= 0 then
-						local craft_modifier = player.character_crafting_speed_modifier
-						player.character_crafting_speed_modifier = craft_modifier - 2
-						entry.craft_mod.active = false
-					end
-				end
-				if entry.bad_trip.active then
-					if entry.bad_trip.remaining_ticks > 0 then
-						entry.bad_trip.remaining_ticks = entry.bad_trip.remaining_ticks - SPICE_DURATION
-					end
-					if entry.bad_trip.remaining_ticks <= 0 then
-						if not settings.global['Kux-Running_Enable'].value then
-							local speed_modifier = player.character_running_speed_modifier
-							player.character_running_speed_modifier = speed_modifier * 1.25
-						end
-						entry.bad_trip.active = false
-					end
-				end
-				if render_table.spice_overlay[player_index] then
-					table.remove(render_table.spice_overlay, player_index)
-				end
-				players_table[player.index].under_influence = false
 			end
+		end
+		if not has_spice_influence(player_index) then
+			local render_table = global.render_table
+			if render_table.spice_overlay[player_index] then
+				render_table.spice_overlay[player_index] = nil
+			end
+			spice_influence_changed_raise(player_index)
+		end
+	end
+end
+
+function player_check()
+	for _, player in pairs(game.connected_players) do
+		local player_index = player.index
+		if has_spice_influence(player_index) or has_bad_trip(player_index) then
+			try_to_remove_spice_effects(player_index, false)
 		end
 	end
 end
@@ -216,28 +291,44 @@ function player_moved(event)
 	local player = game.get_player(player_index)
 	if (player.character) then
 		local character = player.character
-		if has_spice_effects(character) then
+		if has_spice_influence(player_index) then
+			local radar = global.players[player_index].radar
 			local surface = character.surface
-			local radar = surface.create_entity({name = 'spice-radar', position = character.position, force = character.force})
-			if players_table[player_index].radar.reference then
-				players_table[player_index].radar.reference.destroy()
+			local reference = surface.create_entity({name = 'spice-radar', position = character.position, force = character.force})
+			if radar.reference then
+				radar.reference.destroy()
 			end
-			players_table[player_index].radar.reference = radar
+			radar.reference = reference
 		end
 	end
 end
 
 function player_removed(event)
-	table.remove(players_table, event.player_index)
-	if render_table.spice_overlay[event.player_index] then
-		table.remove(render_table.spice_overlay, event.player_index)
-	end
+	local player_index = event.player_index
+	global.players[player_index] = nil
+	global.render_table.spice_overlay[player_index] = nil
 end
 
-function overlay_refresh()
-	for player_index, _ in pairs(render_table.spice_overlay) do
+function player_left(event)
+	local player_index = event.player_index
+	global.render_table.spice_overlay[player_index] = nil
+end
+
+function has_spice_effects(entity)
+	if (entity.stickers) then
+		for _, sticker in pairs(entity.stickers) do
+			if sticker.name == 'spice-applied-sticker' then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function render_refresh()
+	for player_index, _ in pairs(global.render_table.spice_overlay) do
 		local player = game.get_player(player_index)
-		local zoom_factor = players_table[player_index].zoom_factor
+		local zoom_factor = global.players[player_index].zoom_factor
 		rendering.draw_sprite({
 			sprite = 'item.spice-overlay',
 			x_scale = 160 * zoom_factor,
@@ -249,14 +340,6 @@ function overlay_refresh()
 			player = {player}
 		})
 	end
-end
-
--- Util stuff
-
-function load_globals()
-	players_table = global.players
-	spice_effects_blacklist = global.spice_effects_blacklist
-	render_table = global.render_table
 end
 
 function check_and_call_kux_zooming()
@@ -278,30 +361,31 @@ lib.events = {
 	[defines.events.on_player_changed_position] = player_moved,
 	[defines.events.on_player_changed_surface] = player_moved,
 	[defines.events.on_player_removed] = player_removed,
+	[defines.events.on_player_left_game] = player_left,
+	[defines.events.on_player_kicked] = player_left,
 }
 
 lib.on_init = function()
-	load_globals()
 	check_and_call_kux_zooming()
 end
 
 lib.on_configuration_changed = function()
-	load_globals()
 	check_and_call_kux_zooming()
 end
 
 lib.on_load = function ()
-	load_globals()
 	check_and_call_kux_zooming()
 end
 
 lib.on_nth_tick = {
 	[SPICE_DURATION] = function()
 		remove_addiction()
-		remove_spice_effects()
 	end,
-	[OVERLAY_REFRESH] = function()
-		overlay_refresh()
+	[PLAYER_CHECK_TICK] = function()
+		player_check()
+	end,
+	[RENDER_REFRESH_TICK] = function()
+		render_refresh()
 	end
 }
 

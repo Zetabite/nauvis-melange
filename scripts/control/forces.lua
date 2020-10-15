@@ -1,27 +1,29 @@
-local forces_table, competitor_spice_table
 local config = require('scripts.config')
+
 local VICTORY_SPICE_AMOUNT = config.VICTORY_SPICE_AMOUNT
+local VICTORY_CHECK_TICK = config.VICTORY_CHECK_TICK
 
 function force_created(event)
 	local force_index = event.force.index
-	forces_table[force_index] = config.forces_default
+	global.forces[force_index] = config.default.forces
 end
 
 function forces_merged(event)
+	local force_table = global.forces
 	local source_index = event.source_index
 	local force_index = event.destination.index
-	local spice_count = forces_table[source_index].spice_shipped
-	spice_count = spice_count + forces_table[force_index].spice_shipped
-	forces_table[force_index].spice_shipped = spice_count
-	table.remove(forces_table, source_index)
+	local spice_count = force_table[source_index].spice_shipped
+	spice_count = spice_count + force_table[force_index].spice_shipped
+	force_table[force_index].spice_shipped = spice_count
+	force_table[source_index] = nil
 end
 
 function force_reset(event)
-	forces_table[event.force.index] = config.forces_default
+	global.forces[event.force.index] = config.default.forces
 end
 
 function checkSpiceVictory()
-	for force_index, entry in pairs(forces_table) do
+	for force_index, entry in pairs(global.forces) do
 		if entry.spice_shipped >= VICTORY_SPICE_AMOUNT then
 			if remote.interfaces['kr-intergalactic-transceiver'] and remote.interfaces['kr-intergalactic-transceiver']['set_no_victory'] then
 				remote.call('kr-intergalactic-transceiver', 'set_no_victory', true)
@@ -33,10 +35,11 @@ function checkSpiceVictory()
 end
 
 function rocket_launched(event)
+	local force_table = global.forces
 	local force_index = event.rocket.force.index
 	local spice_count = event.rocket.get_inventory(defines.inventory.rocket).get_item_count('spice')
-	spice_count = spice_count + forces_table[force_index].spice_shipped
-	forces_table[force_index].spice_shipped = spice_count
+	spice_count = spice_count + force_table[force_index].spice_shipped
+	force_table[force_index].spice_shipped = spice_count
 end
 
 -- lib
@@ -50,24 +53,9 @@ lib.events = {
 }
 
 lib.on_nth_tick = {
-	[120] = function()
+	[VICTORY_CHECK_TICK] = function()
 		checkSpiceVictory()
 	end
 }
-
-lib.on_init = function()
-	forces_table = global.forces
-	competitor_spice_table = global.competitor_spice
-end
-
-lib.on_configuration_changed = function()
-	forces_table = global.forces
-	competitor_spice_table = global.competitor_spice
-end
-
-lib.on_load = function ()
-	forces_table = global.forces
-	competitor_spice_table = global.competitor_spice
-end
 
 return lib

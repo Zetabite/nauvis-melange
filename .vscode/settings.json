@@ -11,7 +11,10 @@
         "global",
         "script",
         "rendering",
-        "worm_shoot_shiftings"
+        "worm_shoot_shiftings",
+        "mods",
+        "remote",
+        "informatron_make_image"
     ],
     "Lua.diagnostics.disable": [
         "lowercase-global"
