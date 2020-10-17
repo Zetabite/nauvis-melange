@@ -1,9 +1,34 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.2
+Date: 17.10.2020
+  Features:
+    - Added german localization for Informatron intergration
+    - Added option to disable overlay
+  Changes:
+    - Changed some localizations
+    - Lowered volume of spice accelarted heartbeat/breathing
+  Optimizations:
+    - Checked for validity of entities and forces
+  Bugfixes:
+    - Fixed callback calling methods of other interfaces, that either no longer exist or name has changed
+    - Fixed crash when using mod without Kux Running
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.1
+Date: 16.10.2020
+  Changes:
+    - Removed a debug print
+  Bugfixes:
+    - Fixed callback for spice influence
+
+---------------------------------------------------------------------------------------------------
 Version: 0.9.0
 Date: 15.10.2020
-  Changes:
+  Features:
     - Added interface for getting a certain players spice status
+  Changes:
     - Rewrote most of the player regarding code, you can still play in existing worlds, but the addiction system has been resetted
+  Optimizations:
     - Optimised codebase, should be more performant and accurate now
   Bugfixes:
     - Fixed crash due to an empty table when killed by alien
@@ -45,6 +70,7 @@ Date: 12.10.2020
     - Added effect to speed up manual crafting modifier when using spice
   Changes:
     - Reorganized the mods player table
+  Optimizations:
     - Split interface into smaller interfaces (specialization)
   Bugfixes:
     - Fixed crash when using spice in a new game

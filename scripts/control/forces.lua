@@ -1,14 +1,13 @@
 local config = require('scripts.config')
 
 local VICTORY_SPICE_AMOUNT = config.VICTORY_SPICE_AMOUNT
-local VICTORY_CHECK_TICK = config.VICTORY_CHECK_TICK
 
-function force_created(event)
+force_created = function(event)
 	local force_index = event.force.index
 	global.forces[force_index] = config.default.forces
 end
 
-function forces_merged(event)
+forces_merged = function(event)
 	local force_table = global.forces
 	local source_index = event.source_index
 	local force_index = event.destination.index
@@ -18,11 +17,11 @@ function forces_merged(event)
 	force_table[source_index] = nil
 end
 
-function force_reset(event)
+force_reset = function(event)
 	global.forces[event.force.index] = config.default.forces
 end
 
-function checkSpiceVictory()
+checkSpiceVictory = function()
 	for force_index, entry in pairs(global.forces) do
 		if entry.spice_shipped >= VICTORY_SPICE_AMOUNT then
 			if remote.interfaces['kr-intergalactic-transceiver'] and remote.interfaces['kr-intergalactic-transceiver']['set_no_victory'] then
@@ -34,7 +33,7 @@ function checkSpiceVictory()
 	end
 end
 
-function rocket_launched(event)
+rocket_launched = function(event)
 	local force_table = global.forces
 	local force_index = event.rocket.force.index
 	local spice_count = event.rocket.get_inventory(defines.inventory.rocket).get_item_count('spice')
@@ -53,7 +52,7 @@ lib.events = {
 }
 
 lib.on_nth_tick = {
-	[VICTORY_CHECK_TICK] = function()
+	[config.VICTORY_CHECK_TICK] = function()
 		checkSpiceVictory()
 	end
 }

@@ -7,7 +7,7 @@ remote.add_interface('nauvis-melange', {
 	end
 })
 
-function nauvis_melange_menu(player_index)
+nauvis_melange_menu = function(player_index)
 	return {
 		['spice-processing'] = 1,
 		['alien-breeding'] = 1,
@@ -15,7 +15,7 @@ function nauvis_melange_menu(player_index)
 	}
 end
 
-function nauvis_melange_page_content(page_name, player_index, element)
+nauvis_melange_page_content = function(page_name, player_index, element)
 	if page_name == 'nauvis-melange' then
 		element.add{type='label', name='text_1', caption={'nauvis-melange.text_welcome'}}
 	else

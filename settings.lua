@@ -1,5 +1,11 @@
 data:extend({
 	{
+		type = 'bool-setting',
+		name = 'spice-overlay',
+		setting_type = 'runtime-per-user',
+		default_value = true
+	},
+	{
 		type = 'double-setting',
 		name = 'spice-evolution-factor',
 		setting_type = 'runtime-global',

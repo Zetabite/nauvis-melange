@@ -1,10 +1,8 @@
 local config = require('scripts.config')
 
-local WATER_INJECTOR_CHECK_TICK = config.WATER_INJECTOR_CHECK_TICK
-
-function built_entity(event)
+built_entity = function(event)
 	local entity = event.created_entity
-	if(entity) then
+	if entity and entity.valid then
 		if entity.name == 'water-injector-proxy' then
 			local surface = entity.surface
 			local pos = entity.position
@@ -21,31 +19,35 @@ end
 	as they are disabled anyways before being launched.
 	This might be exploitable, but everything else would only hurt honest players
 --]]
-function enable_silos(entity)
+enable_silos = function(entity)
 	local force = entity.force
-	local surface = entity.surface
-	local spacing_guilds = surface.find_entities_filtered({name = 'spacing-guild', force = force})
-	local silos = surface.find_entities_filtered({name = 'rocket-silo', force = force})
-	for _, silo in pairs(silos) do
-		if #spacing_guilds >= #silos then silo.active = true end
+	if force.valid then
+		local surface = entity.surface
+		local spacing_guilds = surface.find_entities_filtered({name = 'spacing-guild', force = force})
+		local silos = surface.find_entities_filtered({name = 'rocket-silo', force = force})
+		for _, silo in pairs(silos) do
+			if #spacing_guilds >= #silos then silo.active = true end
+		end
 	end
 end
 
-function rocket_launch_ordered(event)
+rocket_launch_ordered = function(event)
 	local silo = event.rocket_silo
 	local force = silo.force
-	local surface = silo.surface
-	local spacing_guilds = surface.find_entities_filtered({name = 'spacing-guild', force = force})
-	local silos = surface.find_entities_filtered({name = 'rocket-silo', force = force})
-	if #spacing_guilds >= #silos then
-		force.print({'nauvis-melange.guild-approval-message'})
-	else
-		force.print({'nauvis-melange.guild-intervention-message'})
+	if force.valid then
+		local surface = silo.surface
+		local spacing_guilds = surface.find_entities_filtered({name = 'spacing-guild', force = force})
+		local silos = surface.find_entities_filtered({name = 'rocket-silo', force = force})
+		if #spacing_guilds >= #silos then
+			force.print({'nauvis-melange.guild-approval-message'})
+		else
+			force.print({'nauvis-melange.guild-intervention-message'})
+		end
+		silo.active = (#spacing_guilds >= #silos)
 	end
-	silo.active = (#spacing_guilds >= #silos)
 end
 
-function check_water_injectors()
+check_water_injectors = function()
 	local surface = game.surfaces[1]
 	local water_injectors = surface.find_entities_filtered({name = 'water-injector'})
 	for _, entity in pairs(water_injectors) do
@@ -72,7 +74,7 @@ lib.events = {
 }
 
 lib.on_nth_tick = {
-	[WATER_INJECTOR_CHECK_TICK] = function()
+	[config.WATER_INJECTOR_CHECK_TICK] = function()
 		check_water_injectors()
 	end
 }

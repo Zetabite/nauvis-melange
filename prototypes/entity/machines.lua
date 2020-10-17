@@ -7,7 +7,7 @@ local blank = {
 	height = 64,
 }
 
-function spacing_guild_fluid_box(production_type, position)
+spacing_guild_fluid_box = function(production_type, position)
 	local base_level = {['input'] = -1, ['output'] = 1}
 	return {
 		filter = 'spice-gas',

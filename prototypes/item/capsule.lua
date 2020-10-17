@@ -38,7 +38,7 @@ data:extend({
 										sound = {
 											{
 												filename = '__base__/sound/heartbeat.ogg',
-												volume = 1.0
+												volume = 0.75
 											}
 										},
 									 },

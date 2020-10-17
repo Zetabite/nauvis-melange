@@ -1,11 +1,11 @@
-function created_entity(event)
+created_entity = function(event)
 	local entity = event.entity
-	if entity.name == 'alien-probe-proxy' then
+	if entity and entity.valid and entity.name == 'alien-probe-proxy' then
 		local surface = entity.surface
 		local position = entity.position
 		local radius = 5
 		local alien = surface.find_entities_filtered({type = 'unit', position = position, radius = radius, force = 'enemy', limit = 1})
-		if alien[1] then
+		if alien[1] and alien[1].valid then
 			local aliens_table = global.aliens
 			alien = alien[1]
 			local sample = nil
@@ -14,8 +14,8 @@ function created_entity(event)
 			elseif aliens_table.reverse['worm-turret'][alien.name] then
 				sample = { name = 'worm-sample', count = 1 }
 			end
-			if (sample) then
-				if (event.source) then
+			if sample then
+				if event.source then
 					local player = event.source
 					local inventory = player.get_main_inventory()
 					if inventory.can_insert(sample) then
@@ -29,61 +29,61 @@ function created_entity(event)
 	end
 end
 
-function destroyed_entity(event)
+destroyed_entity = function(event)
 	local cause = event.cause
 	local entity = event.entity
-	if (cause) then
-		if (entity) then
-			if entity.type == 'turret' and string.match(entity.name, 'worm') then
-				create_worm_hole(entity)
-			else
-				spice_effects(cause, entity)
-			end
+	if cause and cause.valid and entity and entity.valid then
+		if entity.type == 'turret' and string.match(entity.name, 'worm') then
+			create_worm_hole(entity)
+		else
+			spice_effects(cause, entity)
 		end
 	end
 end
 
-function create_worm_hole(entity)
+create_worm_hole = function(entity)
 	local surface = entity.surface
-	local pos = entity.position
-	pos = surface.find_non_colliding_position('worm-hole', pos, 2, 0.5, true)
-	if (pos) then
-		surface.create_entity({ name = 'worm-hole', position = pos })
+	local position = entity.position
+	position = surface.find_non_colliding_position('worm-hole', position, 2, 0.5, true)
+	if position then
+		surface.create_entity({ name = 'worm-hole', position = position })
 	end
 end
 
-function spice_effects(cause, victim)
+spice_effects = function(cause, victim)
 	cause = is_spice_collector(cause, victim)
-	if cause then
+	if cause and cause.valid then
 		-- in case we later want to scale effect based on this
 		local spice_amount = has_spice_in_fluidbox(victim) or has_spice_in_inventory(victim)
 		if spice_amount then
-			local spice_settings = {
-				['spice-evolution-factor'] = settings.global['spice-evolution-factor'].value,
-				['spice-direct-evolution-level'] = settings.global['spice-direct-evolution-level'].value,
-				['spice-evolve-neighbours'] = settings.global['spice-evolve-neighbours'].value,
-				['spice-evolve-neighbours-radius'] = settings.global['spice-evolve-neighbours-radius'].value
-			}
 			local force = cause.force
-			force.evolution_factor = force.evolution_factor * spice_settings['spice-evolution-factor']
-			cause = evolve_alien(cause, spice_settings['spice-direct-evolution-level'])
-			apply_spice_to_alien(cause)
-			if spice_settings['spice-evolve-neighbours'] then
-				local surface = cause.surface
-				local position = cause.position
-				local aliens = surface.find_entities_filtered({ name = global.aliens.names, position = position, radius = spice_settings['spice-evolve-neighbours-radius'], force = 'enemy'})
-				for _, alien in pairs(aliens) do
-					if alien ~= cause then evolve_alien(alien, spice_settings['spice-direct-evolution-level'] - 1) end
+			if force.valid and force.name == 'enemy' then
+				local spice_settings = {
+					['spice-evolution-factor'] = settings.global['spice-evolution-factor'].value,
+					['spice-direct-evolution-level'] = settings.global['spice-direct-evolution-level'].value,
+					['spice-evolve-neighbours'] = settings.global['spice-evolve-neighbours'].value,
+					['spice-evolve-neighbours-radius'] = settings.global['spice-evolve-neighbours-radius'].value
+				}
+				force.evolution_factor = force.evolution_factor * spice_settings['spice-evolution-factor']
+				cause = evolve_alien(cause, spice_settings['spice-direct-evolution-level'])
+				apply_spice_to_alien(cause)
+				if spice_settings['spice-evolve-neighbours'] then
+					local surface = cause.surface
+					local position = cause.position
+					local aliens = surface.find_entities_filtered({ name = global.aliens.names, position = position, radius = spice_settings['spice-evolve-neighbours-radius'], force = 'enemy'})
+					for _, alien in pairs(aliens) do
+						if alien ~= cause then evolve_alien(alien, spice_settings['spice-direct-evolution-level'] - 1) end
+					end
 				end
 			end
 		end
 	end
 end
 
-function has_spice_in_fluidbox(victim)
+has_spice_in_fluidbox = function(victim)
 	if victim.type ~= 'character' then
-		if (victim.fluidbox) then
-			local fluidbox = victim.fluidbox
+		local fluidbox = victim.fluidbox
+		if fluidbox and fluidbox.valid then
 			for i = 1, #fluidbox, 1 do
 				if fluidbox.get_locked_fluid(i) == 'spice-gas' then
 					return fluidbox.get_capacity(i)
@@ -94,7 +94,7 @@ function has_spice_in_fluidbox(victim)
 	return false
 end
 
-function has_spice_in_inventory(victim)
+has_spice_in_inventory = function(victim)
 	local inventory = nil
 	if victim.type == 'car' then
 		inventory = victim.get_inventory(defines.inventory.car_trunk)
@@ -121,19 +121,18 @@ function has_spice_in_inventory(victim)
 	return false
 end
 
-function evolve_alien(alien, steps)
+evolve_alien = function(alien, steps)
 	local next_level = get_next_level(alien.name, steps)
 	if next_level ~= alien.name then
 		local surface = alien.surface
 		local position = alien.position
-		local force = alien.force
 		alien.destroy()
-		alien = surface.create_entity({ name = next_level, position = position, force = force})
+		alien = surface.create_entity({ name = next_level, position = position, force = 'enemy'})
 	end
 	return alien
 end
 
-function get_next_level(name, steps)
+get_next_level = function(name, steps)
 	local aliens_table = global.aliens
 	for type_name, entry in pairs(aliens_table.dict) do
 		if aliens_table.reverse[type_name][name] then
@@ -146,7 +145,7 @@ function get_next_level(name, steps)
 	return name
 end
 
-function apply_spice_to_alien(alien)
+apply_spice_to_alien = function(alien)
 	local surface = alien.surface
 	local position = alien.position
 	surface.create_entity({ name = 'spice-speed-sticker', target = alien, position = position })
@@ -155,7 +154,7 @@ function apply_spice_to_alien(alien)
 end
 
 -- only allows melee units to collect spice
-function is_spice_collector(cause, victim)
+is_spice_collector = function(cause, victim)
 	local aliens_table = global.aliens
 	if aliens_table.melee[cause.name] then
 		return cause
@@ -163,7 +162,7 @@ function is_spice_collector(cause, victim)
 		local surface = victim.surface
 		local position = victim.position
 		local brutus = surface.find_entities_filtered({name = aliens_table.names, position = position, radius = 1, force = 'enemy', limit = 1})
-		if (brutus) then return brutus end
+		if brutus and brutus.valid then return brutus end
 	end
 	return false
 end
