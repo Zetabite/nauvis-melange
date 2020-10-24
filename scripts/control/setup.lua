@@ -1,5 +1,7 @@
 local config = require('scripts.config')
 
+global.callbacks = {}
+
 -- Mostly for modders usage
 remote.add_interface('nauvis_melange_functions', {
 	add_to_spice_effects_blacklist = function(key, value)

@@ -1,4 +1,5 @@
 local config = require('scripts.config')
+
 local SPICE_COOLDOWN = config.SPICE_COOLDOWN
 
 data:extend({

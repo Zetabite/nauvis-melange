@@ -4,8 +4,6 @@ local effect_table = config.effect_table
 local OVERLAY_TIMER = config.OVERLAY_TIMER
 local kux_running_setting = settings.global['Kux-Running_Enable']
 
-global.callbacks = {}
-
 remote.add_interface('nauvis_melange_player', {
 	consume_spice = function(player_index, factor, consequence, pre_consumption)
 		return consume_spice(player_index, factor, consequence, pre_consumption)
@@ -14,19 +12,21 @@ remote.add_interface('nauvis_melange_player', {
 		global.players[event.playerIndex].zoom_factor = event.zoomFactor
 	end,
 	spice_influence_changed_add = function(interface_name, function_name)
-		global.callbacks.spice_influence_changed = global.callbacks.spice_influence_changed or {}
+		local callbacks = global.callbacks
+		callbacks.spice_influence_changed = callbacks.spice_influence_changed or {}
 
 		local id = interface_name..'-'..function_name
 		local entry = {
 			interface_name = interface_name,
 			function_name = function_name,
 		}
-		global.callbacks.spice_influence_changed[id] = entry
+		callbacks.spice_influence_changed[id] = entry
 	end,
 	spice_influence_changed_remove = function(interface_name, function_name)
-		global.callbacks.spice_influence_changed = global.callbacks.spice_influence_changed or {}
+		local callbacks = global.callbacks
+		callbacks.spice_influence_changed = callbacks.spice_influence_changed or {}
 		local id = interface_name..'-'..function_name
-		global.callbacks.spice_influence_changed[id] = nil
+		callbacks.spice_influence_changed[id] = nil
 	end,
 	has_spice_influence = function(player_index)
 		return has_spice_influence(player_index)
@@ -49,13 +49,14 @@ function has_bad_trip(player_index)
 end
 
 spice_influence_changed_raise = function(player_index)
-	global.callbacks.spice_influence_changed = global.callbacks.spice_influence_changed or {}
+	local callbacks = global.callbacks
+	callbacks.spice_influence_changed = callbacks.spice_influence_changed or {}
 
 	local event = {
 		player_index = player_index,
 		on_spice = has_spice_influence(player_index)
 	}
-	for _, entry in pairs(global.callbacks.spice_influence_changed) do
+	for _, entry in pairs(callbacks.spice_influence_changed) do
 		if entry then
 			remote.call(entry.interface_name, entry.function_name, event)
 		end
