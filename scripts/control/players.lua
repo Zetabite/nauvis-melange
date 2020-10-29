@@ -8,9 +8,6 @@ remote.add_interface('nauvis_melange_player', {
 	consume_spice = function(player_index, factor, consequence, pre_consumption)
 		return consume_spice(player_index, factor, consequence, pre_consumption)
 	end,
-	onZoomFactorChanged = function(event)
-		global.players[event.playerIndex].zoom_factor = event.zoomFactor
-	end,
 	spice_influence_changed_add = function(interface_name, function_name)
 		local callbacks = global.callbacks
 		callbacks.spice_influence_changed = callbacks.spice_influence_changed or {}
@@ -41,7 +38,7 @@ has_spice_influence = function(player_index)
 	return false
 end
 
-function has_bad_trip(player_index)
+has_bad_trip = function(player_index)
 	if global.players[player_index].bad_trip.tick then
 		return true
 	end
@@ -326,25 +323,17 @@ render_refresh = function()
 	for player_index, enabled in pairs(global.render_table.spice_overlay) do
 		if enabled then
 			local player = game.get_player(player_index)
-			local zoom_factor = global.players[player_index].zoom_factor
+			local display_resolution = player.display_resolution
 			rendering.draw_sprite({
 				sprite = 'item.spice-overlay',
-				x_scale = 160 * zoom_factor,
-				y_scale = 90 * zoom_factor,
+				x_scale = display_resolution.width,
+				y_scale = display_resolution.height,
 				tint = {r = 0.04, g = 0.18, b = 0.66},
 				target = player.character,
 				surface = player.surface,
 				time_to_live = OVERLAY_TIMER,
 				player = {player}
 			})
-		end
-	end
-end
-
-check_and_call_kux_zooming = function()
-	if script.active_mods['Kux-Zooming'] then
-		if remote.interfaces['Kux-Zooming'] and remote.interfaces['Kux-Zooming']['onZoomFactorChanged'] then
-			remote.call('Kux-Zooming', 'onZoomFactorChanged_add', 'nauvis_melange_player', 'onZoomFactorChanged')
 		end
 	end
 end
@@ -363,18 +352,6 @@ lib.events = {
 	[defines.events.on_player_left_game] = player_left,
 	[defines.events.on_player_kicked] = player_left,
 }
-
-lib.on_init = function()
-	check_and_call_kux_zooming()
-end
-
-lib.on_configuration_changed = function()
-	check_and_call_kux_zooming()
-end
-
-lib.on_load = function ()
-	check_and_call_kux_zooming()
-end
 
 lib.on_nth_tick = {
 	[config.SPICE_DURATION] = function()

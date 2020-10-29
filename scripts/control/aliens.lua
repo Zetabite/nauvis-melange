@@ -32,11 +32,13 @@ end
 destroyed_entity = function(event)
 	local cause = event.cause
 	local entity = event.entity
-	if cause and cause.valid and entity and entity.valid then
+	if entity and entity.valid then
 		if entity.type == 'turret' and string.match(entity.name, 'worm') then
 			create_worm_hole(entity)
 		else
-			spice_effects(cause, entity)
+			if cause and cause.valid then
+				spice_effects(cause, entity)
+			end
 		end
 	end
 end

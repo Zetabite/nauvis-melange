@@ -7,6 +7,7 @@ data:extend({
 		icon = '__nauvis-melange__/graphics/icons/worm-hole.png',
 		icon_size = 64, icon_mipmaps = 4,
 		flags = {'placeable-neutral'},
+		collision_mask = {'water-tile'},
 		collision_box = {{ -1.45, -1.45}, {1.45, 1.45}},
 		selection_box = {{ -1.5, -1.5}, {1.5, 1.5}},
 		highlight = true,

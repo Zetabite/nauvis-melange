@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.10.0
+Date: 
+  Optimizations:
+    - Overlay rendering now relies on display resolution insted of zoom (this should have been done in the first place)
+  Bugfixes:
+    - Fixed worm-holes not spawning when in freeplay
+
+---------------------------------------------------------------------------------------------------
 Version: 0.9.2
 Date: 17.10.2020
   Features:
