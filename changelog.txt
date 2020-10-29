@@ -1,8 +1,10 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.10.0
+Version: 0.9.3
+Date: 2020-10-29
 Date: 
   Optimizations:
     - Overlay rendering now relies on display resolution insted of zoom (this should have been done in the first place)
+    - Due to that, mod wont check for Kux-Zooming, as it shouldnt conflict the way it works now
   Bugfixes:
     - Fixed worm-holes not spawning when in freeplay
 
