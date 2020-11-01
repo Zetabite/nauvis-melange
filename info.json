@@ -6,6 +6,7 @@
     "factorio_version": "0.18",
     "dependencies": [
 		"base >= 0.18",
+		"flib >= 0.1.0",
 		"(?) SchallEndgameEvolution >= 1.0.0",
 		"(?) informatron >= 0.1.14",
 		"(?) Krastorio2 >= 1.0.7",

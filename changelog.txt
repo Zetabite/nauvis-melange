@@ -1,11 +1,15 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.9.4
-Date: ????
+Date: 1.11.2020
   Changes:
+    - Requires flib now
+  Bugfixes:
+    - Fixed technology tree working with space exploration
+    - Fixed spidertron stuff being checked in versions where it doesnt exists
+
 ---------------------------------------------------------------------------------------------------
 Version: 0.9.3
-Date: 2020-10-29
-Date: 
+Date: 29.10.2020
   Optimizations:
     - Overlay rendering now relies on display resolution insted of zoom (this should have been done in the first place)
     - Due to that, mod wont check for Kux-Zooming, as it shouldnt conflict the way it works now
