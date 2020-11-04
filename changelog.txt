@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.5
+Date: 4.11.2020
+  Bugfixes:
+    - Fixed water-injector placement by setting the collision mask of the worm-hole back to default
+
+---------------------------------------------------------------------------------------------------
 Version: 0.9.4
 Date: 1.11.2020
   Changes:
