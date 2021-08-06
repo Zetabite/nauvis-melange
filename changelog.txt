@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.10.0
+Date: 7.8.2021
+  Features:
+    - Added image of resource in world generator settings
+  Changes:
+    - Mod content now uses "nm-" prefix, to clash with less mods
+    - Removed old migrations
+  Bugfixes:
+    - Additional checks on player entity to prevent crashes due to player entity not existing
+
+---------------------------------------------------------------------------------------------------
 Version: 0.9.5
 Date: 4.11.2020
   Bugfixes:

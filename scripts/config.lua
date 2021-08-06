@@ -22,39 +22,39 @@ config.effect_table = {'radar', 'craft_mod', 'bad_trip'}
 -- Defaults
 config.default = {}
 config.default.players = {
-	addiction_level = 0,
-	zoom_factor = config.ZOOM_FACTOR,
-	radar = {
-		reference = false,
-		tick = false,
-		duration = config.SPICE_DURATION
-	},
-	bad_trip = {
-		tick = false,
-		duration = config.SPICE_DURATION
-	},
-	craft_mod = {
-		tick = false,
-		duration = config.SPICE_DURATION
-	}
+    addiction_level = 0,
+    zoom_factor = config.ZOOM_FACTOR,
+    radar = {
+        reference = false,
+        tick = false,
+        duration = config.SPICE_DURATION
+    },
+    bad_trip = {
+        tick = false,
+        duration = config.SPICE_DURATION
+    },
+    craft_mod = {
+        tick = false,
+        duration = config.SPICE_DURATION
+    }
 }
 
 config.default.forces = {
-	spice_shipped = 0
+    spice_shipped = 0
 }
 
 config.default.render = {
-		spice_overlay = {}
+        spice_overlay = {}
 }
 
 config.default.spice_effects_blacklist = {
-	type = {
-		['locomotive'] = true,
-		['artillery-wagon'] = true,
-		['cargo-wagon'] = true,
-		['fluid-wagon'] = true
-	},
-	name = {}
+    type = {
+        ['locomotive'] = true,
+        ['artillery-wagon'] = true,
+        ['cargo-wagon'] = true,
+        ['fluid-wagon'] = true
+    },
+    name = {}
 }
 
 return config

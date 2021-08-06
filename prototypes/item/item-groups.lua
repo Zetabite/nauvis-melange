@@ -1,8 +1,8 @@
 data:extend({
-	{
-		type = 'item-subgroup',
-		name = 'alien-breeding',
-		group = 'intermediate-products',
-		order = 'z'
-	},
+    {
+        type = 'item-subgroup',
+        name = 'nm-alien-breeding',
+        group = 'intermediate-products',
+        order = 'z'
+    },
 })

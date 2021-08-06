@@ -1,6 +1,6 @@
 data:extend({
-	{
-		type = 'resource-category',
-		name = 'deep-solid'
-	},
+    {
+        type = 'resource-category',
+        name = 'nm-deep-solid'
+    },
 })
