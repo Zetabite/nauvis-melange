@@ -4,12 +4,12 @@ local SPICE_DURATION = config.SPICE_DURATION
 data:extend({
     {
         type = 'sticker',
-        name = 'spice-applied-sticker',
+        name = 'nm-spice-applied-sticker',
         duration_in_ticks = SPICE_DURATION
     },
     {
         type = 'sticker',
-        name = 'spice-speed-sticker',
+        name = 'nm-spice-speed-sticker',
         duration_in_ticks = SPICE_DURATION,
         target_movement_modifier = 2
     },
