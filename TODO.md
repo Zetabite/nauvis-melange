@@ -18,10 +18,16 @@
 - spice ionising/spraying for area effects -> addicting aliens, force attack
 - worm size dependent deposits
 
+- getting alien blood samples
+    - drop chance (low probability)
+    - automatable
+    - multiplicate samples (needs to be way more expensive)
+
 # Possible Support
 - Warptorio support
 
 # No plans yet
+- spice needed for expensive researches
 - Teleporting via Spice
 - beverages
     - coffee
@@ -29,7 +35,10 @@
     - liquor
 
 # Unlikely to be added in Future
-- spawn natural spice deposits only in desert (alien biomes)
+- diverse SE support 
+    - adding/modifying stuff isnt welcome by them
+    - might change my opinion once that mindset of them changes
+- spawn natural spice deposits only in desert (alien biomes) (eh idk, i just make it rare enough)
 
 # Sources
 https://en.wikipedia.org/wiki/Glossary_of_Dune_(franchise)_terminology
