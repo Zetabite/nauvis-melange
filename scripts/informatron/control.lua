@@ -9,9 +9,9 @@ remote.add_interface('nauvis-melange', {
 
 nauvis_melange_menu = function(player_index)
     return {
-        ['nm-spice-processing'] = 1,
-        ['nm-alien-breeding'] = 1,
-        ['nm-spacing-guild'] = 1
+        ['spice-processing'] = 1,
+        ['alien-breeding'] = 1,
+        ['spacing-guild'] = 1
     }
 end
 
