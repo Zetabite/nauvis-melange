@@ -1,13 +1,13 @@
 data:extend({
     {
         type = 'bool-setting',
-        name = 'spice-overlay',
+        name = 'nm-spice-overlay',
         setting_type = 'runtime-per-user',
         default_value = true
     },
     {
         type = 'double-setting',
-        name = 'spice-evolution-factor',
+        name = 'nm-spice-evolution-factor',
         setting_type = 'runtime-global',
         minimum_value = 1.0,
         maximum_value = 10.0,
@@ -15,7 +15,7 @@ data:extend({
     },
     {
         type = 'int-setting',
-        name = 'spice-direct-evolution-level',
+        name = 'nm-spice-direct-evolution-level',
         setting_type = 'runtime-global',
         minimum_value = 0,
         maximum_value = 20,
@@ -23,13 +23,13 @@ data:extend({
     },
     {
         type = 'bool-setting',
-        name = 'spice-evolve-neighbours',
+        name = 'nm-spice-evolve-neighbours',
         setting_type = 'runtime-global',
         default_value = true
     },
     {
         type = 'int-setting',
-        name = 'spice-evolve-neighbours-radius',
+        name = 'nm-spice-evolve-neighbours-radius',
         setting_type = 'runtime-global',
         minimum_value = 0,
         maximum_value = 24,
