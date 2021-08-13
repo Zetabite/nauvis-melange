@@ -1,8 +1,10 @@
 # Actual TODO
 - vehicles
-    - mobile spice harvester
+    - mobile spice harvester -> D.U.N.E.
         - not as expensive as water injector setup
         - less effective than water injector setup
+	- thumper - calls travel worm
+	- spawn worms when travelling under spice influence
 
 - products
     - paper (use case?)
@@ -11,30 +13,32 @@
     - spice cloth (use case?)
     - spice fiber
 
-- thumper - calls worms
+- deposits
+	- worm size dependent deposits
+	- remember waterfillage
+
 - artificial spice from fish
-- (interstellar probes need spice)
-- spawn worms when travelling under spice influence
 - spice ionising/spraying for area effects -> addicting aliens, force attack
-- worm size dependent deposits
 
 - getting alien blood samples
     - drop chance (low probability)
     - automatable
     - multiplicate samples (needs to be way more expensive)
 
-# Possible Support
-- Warptorio support
+# Bugs
+- https://mods.factorio.com/mod/Mining_Drones mines wormholes, still the case?
 
 # No plans yet
 - spice needed for expensive researches
 - Teleporting via Spice
+- interstellar probes need spice
 - beverages
     - coffee
     - beer
     - liquor
 
 # Unlikely to be added in Future
+- Warptorio support
 - diverse SE support 
     - adding/modifying stuff isnt welcome by them
     - might change my opinion once that mindset of them changes

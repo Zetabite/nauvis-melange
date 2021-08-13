@@ -1,5 +1,6 @@
 created_entity = function(event)
     local entity = event.entity
+
     if entity and entity.valid and entity.name == 'nm-alien-probe-proxy' then
         local surface = entity.surface
         local position = entity.position

@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.10.4
+Date: 14.8.2021
+  Features:
+    - Added base code for D.U.N.E. Miner, mobile harvester (this means you cant obtain and use it yet)
+    - Added base code for driver entity for future pathfinding AI to call worm per thumper
+  Changes:
+    - Made water injector explosion use its own explosion, so its not dependent on changes by other mods
+  Bugfixes:
+    - Using own explosion for water injector fixed bug where mistakenly a prefix was used
+
+---------------------------------------------------------------------------------------------------
 Version: 0.10.3
 Date: 7.8.2021
   Bugfixes:

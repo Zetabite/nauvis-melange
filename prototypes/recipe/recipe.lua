@@ -73,6 +73,36 @@ data:extend({
         },
         result = 'nm-spacing-guild'
     },
+    --[[
+    {
+        type = 'recipe',
+        name = 'nm-d-u-n-e',
+        normal = {
+          enabled = true,
+          energy_required = 5,
+          ingredients =
+          {
+            {'engine-unit', 32},
+            {'steel-plate', 50},
+            {'iron-gear-wheel', 15},
+            {'advanced-circuit', 10}
+          },
+          result = 'nm-d-u-n-e'
+        },
+        expensive = {
+          enabled = true,
+          energy_required = 8,
+          ingredients =
+          {
+            {'engine-unit', 64},
+            {'steel-plate', 100},
+            {'iron-gear-wheel', 30},
+            {'advanced-circuit', 20}
+          },
+          result = 'nm-d-u-n-e'
+        }
+    },
+    ]]
 
     -- Items
     {

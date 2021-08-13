@@ -29,6 +29,32 @@ init = {
         end
     end,
 
+    -- D.U.N.E's table for miners
+    track_dune_miners = function()
+        global.track_dune_miners = {}
+        for surface_index,_ in pairs(game.surfaces) do
+            local surface = game.surfaces[surface_index]
+            local entities = surface.find_entities_filtered({name = 'nm-d-u-n-e'})
+            for _, entity in pairs(entities) do
+                local registration_number = script.register_on_entity_destroyed(entity)
+                global.track_dune_miners[registration_number] = entity
+            end
+        end
+    end,
+
+    -- Water Injector table
+    track_water_injectors = function()
+        global.track_water_injectors = {}
+        for surface_index,_ in pairs(game.surfaces) do
+            local surface = game.surfaces[surface_index]
+            local entities = surface.find_entities_filtered({name = 'nm-water-injector'})
+            for _, entity in pairs(entities) do
+                local registration_number = script.register_on_entity_destroyed(entity)
+                global.track_water_injectors[registration_number] = entity
+            end
+        end
+    end,
+
     -- Aliens Table
     aliens = function()
         global.aliens = {}
@@ -153,7 +179,13 @@ configuration_changed = {
     end,
     competitor_spice = function()
         init.competitor_spice()
-    end
+    end,
+    track_dune_miners = function()
+        init.track_dune_miners()
+    end,
+    track_water_injectors = function()
+        init.track_water_injectors()
+    end,
 }
 
 -- lib
@@ -166,6 +198,8 @@ lib.on_init = function()
     init.players()
     init.forces()
     init.competitor_spice()
+    init.track_dune_miners()
+    init.track_water_injectors()
 end
 
 lib.on_configuration_changed = function()
@@ -175,6 +209,8 @@ lib.on_configuration_changed = function()
     configuration_changed.players()
     configuration_changed.forces()
     configuration_changed.competitor_spice()
+    configuration_changed.track_dune_miners()
+    configuration_changed.track_water_injectors()
 end
 
 return lib

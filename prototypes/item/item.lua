@@ -60,6 +60,18 @@ data:extend({
         place_result = 'nm-travel-worm',
         stack_size = 1
     },
+    --[[
+    {
+        type = 'item-with-entity-data',
+        name = 'nm-d-u-n-e',
+        icon = '__base__/graphics/icons/tank.png',
+        icon_size = 64, icon_mipmaps = 4,
+        subgroup = 'transport',
+        order = 'b[personal-transport]-b[nm-d-u-n-e]',
+        place_result = 'nm-d-u-n-e',
+        stack_size = 1
+    },
+    ]]
 
     -- Items
     {
@@ -120,11 +132,11 @@ data:extend({
         name = 'thumper',
         localised_name = {'entity-name.thumper'},
         localised_description = {'entity-description.thumper'},
-        icon = '__nauvis-melange__/graphics/icons/drying-rig.png',
+        icon = '__nauvis-melange__/graphics/icons/thumper.png',
         icon_size = 64, icon_mipmaps = 4,
         subgroup = 'intermediate-product',
         place_result = 'thumper',
-        stack_size = 50
+        stack_size = 1
     },
     --]]
     {
