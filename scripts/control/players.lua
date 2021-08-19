@@ -1,8 +1,8 @@
 local config = require('scripts.config')
 
 local effect_table = config.effect_table
-local OVERLAY_TIMER = config.OVERLAY_TIMER
 local kux_running_setting = settings.global['Kux-Running_Enable']
+local OVERLAY_TIMER = config.OVERLAY_TIMER
 
 remote.add_interface('nauvis_melange_player', {
     consume_spice = function(player_index, factor, consequence, pre_consumption)
@@ -320,7 +320,7 @@ has_spice_effects = function(entity)
     return false
 end
 
-render_refresh = function()
+render_spice_overlay_refresh = function()
     for player_index, enabled in pairs(global.render_table.spice_overlay) do
         if enabled then
             local player = game.get_player(player_index)
@@ -365,7 +365,7 @@ lib.on_nth_tick = {
         player_check()
     end,
     [config.RENDER_REFRESH_TICK] = function()
-        render_refresh()
+        render_spice_overlay_refresh()
     end
 }
 

@@ -83,5 +83,63 @@ data:extend({
         subgroup = 'nm-alien-breeding',
         order = 'd[nm-alien-probe]',
         stack_size = 50
+    },
+    {
+        type = 'capsule',
+        name = 'nm-thumper',
+        icon = '__nauvis-melange__/graphics/icons/thumper.png',
+        icon_size = 64, icon_mipmaps = 4,
+        capsule_action = {
+            type = 'use-on-self',
+            uses_stack = false,
+            attack_parameters = {
+                type = 'projectile',
+                ammo_type = {
+                    category = 'capsule',
+                    target_type = 'position'
+                },
+                cooldown = 20,
+                range = 5,
+                sound = {
+                    {
+                        filename = '__base__/sound/heartbeat.ogg',
+                        volume = 0.75
+                    }
+                }
+            }
+        },
+        subgroup = 'nm-alien-breeding',
+        order = 'd[nm-thumper]',
+        stack_size = 1
+    },
+    {
+        type = 'capsule',
+        name = 'nm-thumper-creative',
+        icon = '__nauvis-melange__/graphics/icons/thumper.png',
+        icon_size = 64, icon_mipmaps = 4,
+        capsule_action = {
+            type = 'throw',
+            uses_stack = false,
+            attack_parameters = {
+                type = 'projectile',
+                ammo_type = {
+                    category = 'capsule',
+                    target_type = 'position'
+                },
+                cooldown = 20,
+                range = 5,
+                --[[
+                sound = {
+                    {
+                        filename = '__base__/sound/heartbeat.ogg',
+                        volume = 0.75
+                    }
+                }
+                ]]
+            }
+        },
+        subgroup = 'nm-alien-breeding',
+        order = 'd[nm-thumper-creative]',
+        stack_size = 1
     }
 })

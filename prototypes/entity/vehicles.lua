@@ -1,31 +1,29 @@
-require ('__base__.prototypes.entity.worm-animations')
+require ('prototypes.animations.travel-worm')
 local travel_worm_sounds = require('prototypes.entity.travel-worm-sounds')
 local movement_triggers = require('__base__.prototypes.entity.movement-triggers')
 local hit_effects = require ('__base__.prototypes.entity.hit-effects')
 local sounds = require('__base__.prototypes.entity.sounds')
 
-local scale_worm_small = 0.65
-local tint_worm_small = {r = 0.917, g = 1.000, b = 0.282, a = 1.000}
 local tank_shift_y = 6
 
-data:extend({
-    {
+function travel_worm(tier)
+    return {
         type = 'car',
-        name = 'nm-travel-worm',
-        icon = '__nauvis-melange__/graphics/icons/travel-worm.png',
+        name = 'nm-travel-worm-'..tier,
+        icon = '__nauvis-melange__/graphics/icons/'..tier..'-travel-worm.png',
         icon_size = 64, icon_mipmaps = 4,
         flags = {'placeable-neutral', 'player-creation', 'placeable-off-grid', 'not-flammable'},
-        minable = {mining_time = 0.4, result = 'nm-travel-worm'},
+        minable = {mining_time = 0.4, result = 'nm-travel-worm-'..tier},
         mined_sound = travel_worm_sounds.mined,
-        max_health = 200,
-        corpse = 'small-worm-corpse',
-           dying_explosion = 'small-worm-die',
+        max_health = health_worm(tier),
+        corpse = ''..tier..'-worm-corpse',
+        dying_explosion = ''..tier..'-worm-die',
         alert_icon_shift = util.by_pixel(0, -13),
         energy_per_hit_point = 1,
         crash_trigger = crash_trigger(),
-        resistances = {},
-        collision_box = {{-0.9, -1.5 }, {0.9, 0.8}},
-        selection_box = {{-0.9, -1.5 }, {0.9, 0.8}},
+        resistances = resistances_worm(tier),
+        collision_box = collision_box_worm(tier),
+        selection_box = collision_box_worm(tier),
         damaged_trigger_effect = hit_effects.entity(),
         effectivity = 0.5,
         braking_power = '400kW',
@@ -33,7 +31,7 @@ data:extend({
         terrain_friction_modifier = 0.2,
         friction = 0.002,
         render_layer = 'object',
-        animation = worm_start_attack_animation(scale_worm_small, tint_worm_small),
+        animation = worm_start_attack_animation(scale_worm(tier), tint_worm(tier)),
         energy_source = {
             type = 'void'
         },
@@ -62,8 +60,28 @@ data:extend({
         --guns = { 'travel-worm-gun' },
         guns = {},
         inventory_size = 0,
-    },
-    --[[
+    }
+end
+
+function worm_change_pos_animation(tier, direction)
+    local playback = {submerge = 'backward', emerge = 'forward'}
+    return {
+        type = 'corpse',
+        name = 'nm-'..direction..'-animation-'..tier,
+        icon = '__nauvis-melange__/graphics/icons/'..tier..'-travel-worm.png',
+        icon_size = 64, icon_mipmaps = 4,
+        time_before_removed = 60 * 8,
+        dying_speed = 1.0,
+        time_before_shading_off = 60 * 0,
+        animation = worm_preparing_animation(scale_worm[tier], tint_worm[tier], playback[direction])
+    }
+end
+
+data:extend({
+    travel_worm('small'),
+    travel_worm('medium'),
+    travel_worm('big'),
+    travel_worm('behemoth'),
     {
         type = 'car',
         name = 'nm-d-u-n-e', -- Deison United - Newton Extractor
@@ -441,5 +459,4 @@ data:extend({
             orientation_to_variation = false
         }
     }
-    ]]
 })

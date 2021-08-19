@@ -1,19 +1,18 @@
 local config = require('scripts.config')
+local HIGH_FIDELITY_CHECK_TICK = config.HIGH_FIDELITY_CHECK_TICK
 local WATER_INJECTOR_THRESHOLD = config.WATER_INJECTOR_THRESHOLD
 
 built_entity = function(event)
-    local entity = event.created_entity
-
-    if event.destination then
-        entity = event.destination
-    end
+    local entity = event.created_entity or event.destination
+    local creator = event.robot or game.get_player(event.player_index)
+    local creator_force = creator.force or 'neutral'
 
     if entity and entity.valid then
         if entity.name == 'nm-water-injector-proxy' then
             local surface = entity.surface
             local pos = entity.position
             entity.destroy()
-            local water_injector = surface.create_entity({name = 'nm-water-injector', position = pos, force = 'neutral'})
+            local water_injector = surface.create_entity({name = 'nm-water-injector', position = pos, force = creator_force})
             local registration_number = script.register_on_entity_destroyed(water_injector)
             global.track_water_injectors[registration_number] = water_injector
         elseif entity.name == 'nm-spacing-guild' then enable_silos(entity)
@@ -23,8 +22,9 @@ built_entity = function(event)
 end
 
 destroyed_entity = function(event)
-    if global.track_water_injectors[event.registration_number] then
-        global.track_water_injectors[event.registration_number] = nil
+    local entry = global.track_water_injectors[event.registration_number]
+    if entry then
+        entry = nil
     end
 end
 
@@ -62,7 +62,7 @@ rocket_launch_ordered = function(event)
 end
 
 check_water_injectors = function()
-    for _,water_injector in pairs(global.track_water_injectors) do
+    for _, water_injector in pairs(global.track_water_injectors) do
         local entity = water_injector
         if entity and entity.valid then
             local surface = game.surfaces[entity.surface.index]
@@ -95,7 +95,7 @@ lib.events = {
 }
 
 lib.on_nth_tick = {
-    [config.WATER_INJECTOR_CHECK_TICK] = function()
+    [config.HIGH_FIDELITY_CHECK_TICK] = function()
         check_water_injectors()
     end
 }

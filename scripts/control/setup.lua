@@ -1,4 +1,5 @@
 local config = require('scripts.config')
+local util = require('util')
 
 global.callbacks = {}
 
@@ -12,47 +13,25 @@ remote.add_interface('nauvis_melange_functions', {
     end
 })
 
--- Inits
+-- First time loading mod in save
 init = {
     players = function()
         global.players = {}
         for _, player in pairs(game.connected_players) do
-            global.players[player.index] = config.default.players
+            global.players[player.index] = util.copy(config.default.players)
         end
     end,
 
     -- Forces table for winning condition
     forces = function()
         global.forces = {}
+        local forces = {}
         for _, force in pairs(game.forces) do
-            global.forces[force.index] = config.default.forces
+            local force_index = force.index
+            forces[force_index] = util.copy(config.default.forces)
+            forces[force_index].force = force
         end
-    end,
-
-    -- D.U.N.E's table for miners
-    track_dune_miners = function()
-        global.track_dune_miners = {}
-        for surface_index,_ in pairs(game.surfaces) do
-            local surface = game.surfaces[surface_index]
-            local entities = surface.find_entities_filtered({name = 'nm-d-u-n-e'})
-            for _, entity in pairs(entities) do
-                local registration_number = script.register_on_entity_destroyed(entity)
-                global.track_dune_miners[registration_number] = entity
-            end
-        end
-    end,
-
-    -- Water Injector table
-    track_water_injectors = function()
-        global.track_water_injectors = {}
-        for surface_index,_ in pairs(game.surfaces) do
-            local surface = game.surfaces[surface_index]
-            local entities = surface.find_entities_filtered({name = 'nm-water-injector'})
-            for _, entity in pairs(entities) do
-                local registration_number = script.register_on_entity_destroyed(entity)
-                global.track_water_injectors[registration_number] = entity
-            end
-        end
+        global.forces = forces
     end,
 
     -- Aliens Table
@@ -126,14 +105,14 @@ init = {
     end
 }
 
--- Inits
+-- Mod setup changed (update, mod settings, etc..)
 configuration_changed = {
     players = function()
         -- Change for next version in case of change
         local players_table = global.players
         if players_table then
             for player_index,_ in pairs(players_table) do
-                local default = config.default.players
+                local default = util.copy(config.default.players)
                 if players_table[player_index].under_influence ~= nil then
                     players_table[player_index] = default
                 else
@@ -161,8 +140,12 @@ configuration_changed = {
             local forces = {}
             for force_index, entry in pairs(global.forces) do
                 if #entry <= 0 then
-                    for subkey, value in pairs(config.default.forces) do
+                    local default = util.copy(config.default.forces)
+                    for subkey, value in pairs(default) do
                         if not entry[subkey] then
+                            if subkey == 'force' then
+                                value = game.forces[force_index]
+                            end
                             entry[subkey] = value
                         end
                     end
@@ -181,10 +164,43 @@ configuration_changed = {
         init.competitor_spice()
     end,
     track_dune_miners = function()
-        init.track_dune_miners()
+        global.track_dune_miners = {}
+        for surface_index,_ in pairs(game.surfaces) do
+            local surface = game.surfaces[surface_index]
+            local entities = surface.find_entities_filtered({name = 'nm-d-u-n-e'})
+            for _, entity in pairs(entities) do
+                local registration_number = script.register_on_entity_destroyed(entity)
+                global.track_dune_miners[registration_number] = entity
+            end
+        end
     end,
     track_water_injectors = function()
-        init.track_water_injectors()
+        global.track_water_injectors = {}
+        for surface_index,_ in pairs(game.surfaces) do
+            local surface = game.surfaces[surface_index]
+            local entities = surface.find_entities_filtered({name = 'nm-water-injector'})
+            for _, entity in pairs(entities) do
+                local registration_number = script.register_on_entity_destroyed(entity)
+                global.track_water_injectors[registration_number] = entity
+            end
+        end
+    end,
+    track_travel_worms = function()
+        global.track_travel_worms = {}
+        local tiers = {[1] = 'small', [2] = 'medium', [3] = 'big', [4] = 'behemoth'}
+        for surface_index,_ in pairs(game.surfaces) do
+            local surface = game.surfaces[surface_index]
+            local travel_worms = {}
+            for _, tier in pairs(tiers) do
+                local entities = surface.find_entities_filtered({name = 'nm-travel-worm-'..tier})
+                for _, entity in pairs(entities) do
+                    local registration_number = script.register_on_entity_destroyed(entity)
+                    travel_worms[registration_number] = entity
+                    global.forces[entity.force.index]['travel_worms'][registration_number] = entity
+                end
+            end
+            global.track_travel_worms = travel_worms
+        end
     end,
 }
 
@@ -192,25 +208,29 @@ configuration_changed = {
 local lib = {}
 
 lib.on_init = function()
-    global.render_table = config.default.render
-    global.spice_effects_blacklist = config.default.spice_effects_blacklist
+    global.render_table = util.copy(config.default.render)
+    global.spice_effects_blacklist = util.copy(config.default.spice_effects_blacklist)
+    global.travel_worm_data = util.copy(config.default.travel_worm_data)
+    global.track_travel_worms = {}
+    global.track_dune_miners = {}
+    global.track_water_injectors = {}
+    init.forces()
     init.aliens()
     init.players()
-    init.forces()
-    init.competitor_spice()
-    init.track_dune_miners()
-    init.track_water_injectors()
+    --init.forces()
 end
 
 lib.on_configuration_changed = function()
-    global.render_table = global.render_table or config.default.render
-    global.spice_effects_blacklist = global.spice_effects_blacklist or config.default.spice_effects_blacklist
+    global.render_table = global.render_table or util.copy(config.default.render)
+    global.spice_effects_blacklist = global.spice_effects_blacklist or util.copy(config.default.spice_effects_blacklist)
+    global.travel_worm_data = global.travel_worm_data or util.copy(config.default.travel_worm_data)
     configuration_changed.aliens()
     configuration_changed.players()
     configuration_changed.forces()
     configuration_changed.competitor_spice()
     configuration_changed.track_dune_miners()
     configuration_changed.track_water_injectors()
+    configuration_changed.track_travel_worms()
 end
 
 return lib

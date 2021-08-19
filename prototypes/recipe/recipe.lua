@@ -1,3 +1,21 @@
+function travel_worm_recipe(tier)
+    return {
+        type = 'recipe',
+        name = 'nm-travel-worm-'..tier,
+        localised_name = {'entity-name.nm-travel-worm-'..tier},
+        localised_description = {'entity-description.nm-travel-worm-'..tier},
+        category = 'nm-alien-growing',
+        energy_required = 120,
+        enabled = false,
+        ingredients = {
+            { 'nm-sandtrout-'..tier, 1 },
+            { 'nm-spice', 50 }
+        },
+        result = 'nm-travel-worm-'..tier
+    }
+end
+
+
 data:extend({
     -- Entities
     {
@@ -43,20 +61,10 @@ data:extend({
         },
         result = 'nm-alien-growth-chamber'
     },
-    {
-        type = 'recipe',
-        name = 'nm-travel-worm',
-        localised_name = {'entity-name.nm-travel-worm'},
-        localised_description = {'entity-description.nm-travel-worm'},
-        category = 'nm-alien-growing',
-        energy_required = 120,
-        enabled = false,
-        ingredients = {
-            { 'nm-sandtrout', 1 },
-            { 'nm-spice', 50 }
-        },
-        result = 'nm-travel-worm'
-    },
+    travel_worm_recipe('small'),
+    travel_worm_recipe('medium'),
+    travel_worm_recipe('big'),
+    travel_worm_recipe('behemoth'),
     {
         type = 'recipe',
         name = 'nm-spacing-guild',
@@ -73,7 +81,6 @@ data:extend({
         },
         result = 'nm-spacing-guild'
     },
-    --[[
     {
         type = 'recipe',
         name = 'nm-d-u-n-e',
@@ -102,7 +109,6 @@ data:extend({
           result = 'nm-d-u-n-e'
         }
     },
-    ]]
 
     -- Items
     {
@@ -122,21 +128,6 @@ data:extend({
             { type = 'item', name = 'nm-solar-component-foil', amount = 20 }
         },
     },
-    --[[
-    {
-        type = 'recipe',
-        name = 'solar-drying-panel',
-        localised_name = {'item-name.solar-drying-panel'},
-        localised_description = {'item-description.solar-drying-panel'},
-        category = 'crafting',
-        energy_required = 1,
-        enabled = false,
-        ingredients = {
-            { 'solar-panel', 1 },
-        },
-        result = 'drying-rig'
-    },
-    --]]
     {
         type = 'recipe',
         name = 'nm-spice',
@@ -150,18 +141,69 @@ data:extend({
     },
     {
         type = 'recipe',
-        name = 'nm-sandtrout',
-        localised_name = {'item-name.nm-sandtrout'},
-        localised_description = {'item-description.nm-sandtrout'},
+        name = 'nm-sandtrout-small',
+        localised_name = {'item-name.nm-sandtrout-small'},
+        localised_description = {'item-description.nm-sandtrout-small'},
         category = 'nm-alien-growing',
         energy_required = 60,
         enabled = false,
         ingredients = {
             { 'nm-pre-spice-mass', 20 },
-            { 'nm-worm-sample', 20 }
+            { 'nm-worm-sample-small', 1 }
         },
         results = {
-            { type = 'item', name = 'nm-sandtrout', amount = 20 }
+            { type = 'item', name = 'nm-sandtrout-small', amount = 1 }
+        },
+    },
+    {
+        type = 'recipe',
+        name = 'nm-sandtrout-medium',
+        localised_name = {'item-name.nm-sandtrout-medium'},
+        localised_description = {'item-description.nm-sandtrout-medium'},
+        category = 'nm-alien-growing',
+        energy_required = 120,
+        enabled = false,
+        ingredients = {
+            { 'nm-sandtrout-small', 1 },
+            { 'nm-pre-spice-mass', 40 },
+            { 'nm-worm-sample-medium', 1 }
+        },
+        results = {
+            { type = 'item', name = 'nm-sandtrout-medium', amount = 1 }
+        },
+    },
+    {
+        type = 'recipe',
+        name = 'nm-sandtrout-big',
+        localised_name = {'item-name.nm-sandtrout-big'},
+        localised_description = {'item-description.nm-sandtrout-big'},
+        category = 'nm-alien-growing',
+        energy_required = 240,
+        enabled = false,
+        ingredients = {
+            { 'nm-sandtrout-medium', 1 },
+            { 'nm-pre-spice-mass', 40 },
+            { 'nm-worm-sample-big', 1 }
+        },
+        results = {
+            { type = 'item', name = 'nm-sandtrout-big', amount = 1 }
+        },
+    },
+    {
+        type = 'recipe',
+        name = 'nm-sandtrout-behemoth',
+        localised_name = {'item-name.nm-sandtrout-behemoth'},
+        localised_description = {'item-description.nm-sandtrout-behemoth'},
+        category = 'nm-alien-growing',
+        energy_required = 240,
+        enabled = false,
+        ingredients = {
+            { 'nm-sandtrout-big', 1 },
+            { 'nm-pre-spice-mass', 100 },
+            { 'nm-worm-sample-behemoth', 1 }
+        },
+        results = {
+            { type = 'item', name = 'nm-sandtrout-behemoth', amount = 1 }
         },
     },
     {
@@ -193,6 +235,32 @@ data:extend({
             { 'iron-stick', 1 },
         },
         result = 'nm-alien-probe'
+    },
+    {
+        type = 'recipe',
+        name = 'nm-thumper',
+        localised_name = {'item-name.nm-thumper'},
+        localised_description = {'item-description.nm-thumper'},
+        category = 'crafting',
+        energy_required = 4,
+        enabled = false,
+        ingredients = {
+            { 'iron-stick', 1 },
+        },
+        result = 'nm-thumper'
+    },
+    {
+        type = 'recipe',
+        name = 'nm-thumper-creative',
+        localised_name = {'item-name.nm-thumper-creative'},
+        localised_description = {'item-description.nm-thumper-creative'},
+        category = 'crafting',
+        energy_required = 4,
+        enabled = true,
+        ingredients = {
+            { 'iron-stick', 1 },
+        },
+        result = 'nm-thumper-creative'
     },
     {
         type = 'recipe',

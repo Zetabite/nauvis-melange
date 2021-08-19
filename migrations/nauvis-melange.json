@@ -1,0 +1,11 @@
+{
+    "entity":
+    [
+      ["nm-travel-worm", "nm-travel-worm-small"]
+    ],
+    "item":
+    [
+        ["nm-travel-worm", "nm-travel-worm-small"],
+        ["nm-worm-sample", "nm-worm-sample-small"]
+    ]
+}

@@ -3,8 +3,21 @@
     - mobile spice harvester -> D.U.N.E.
         - not as expensive as water injector setup
         - less effective than water injector setup
-	- thumper - calls travel worm
-	- spawn worms when travelling under spice influence
+    - travel worm
+        - add to force table and rebuild every game launch
+        - thumper - calls travel worm
+            - a capsule where the capsule_action has uses_stack set to false
+            - thumper calls the nearest worm of force
+            - procedure
+                1. call
+                2. copy render data
+                3. make invisible
+                4. spawn in folding animation
+                5. teleport
+                6. spawn out folding animation
+                7. save render data back to entity
+        - subgroup for different travel worms
+    - spawn worms when travelling under spice influence
 
 - products
     - paper (use case?)
@@ -14,8 +27,8 @@
     - spice fiber
 
 - deposits
-	- worm size dependent deposits
-	- remember waterfillage
+    - worm size dependent deposits
+    - remember waterfillage
 
 - artificial spice from fish
 - spice ionising/spraying for area effects -> addicting aliens, force attack

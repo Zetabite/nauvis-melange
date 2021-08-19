@@ -49,20 +49,44 @@ data:extend({
             },
             {
                 type = 'unlock-recipe',
-                recipe = 'nm-alien-probe'
-            },
-            {
-                type = 'unlock-recipe',
                 recipe = 'nm-biter-leech'
             },
             {
                 type = 'unlock-recipe',
-                recipe = 'nm-sandtrout'
+                recipe = 'nm-sandtrout-small'
             },
             {
                 type = 'unlock-recipe',
-                recipe = 'nm-travel-worm'
+                recipe = 'nm-sandtrout-medium'
             },
+            {
+                type = 'unlock-recipe',
+                recipe = 'nm-sandtrout-big'
+            },
+            {
+                type = 'unlock-recipe',
+                recipe = 'nm-sandtrout-behemoth'
+            },
+            {
+                type = 'unlock-recipe',
+                recipe = 'nm-travel-worm-small'
+            },
+            {
+                type = 'unlock-recipe',
+                recipe = 'nm-travel-worm-medium'
+            },
+            {
+                type = 'unlock-recipe',
+                recipe = 'nm-travel-worm-big'
+            },
+            {
+                type = 'unlock-recipe',
+                recipe = 'nm-travel-worm-behemoth'
+            },
+            {
+                type = 'unlock-recipe',
+                recipe = 'nm-thumper'
+            }
         },
         unit = {
             count = 250,
