@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.11.0
-Date: 20.4.2022
+Date: 2022-04-20
   Features:
     - Travel worm overhaul
       - Tier based (small, medium, big, behemoth)
