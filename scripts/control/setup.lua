@@ -210,7 +210,7 @@ local lib = {}
 lib.on_init = function()
     global.render_table = util.copy(config.default.render)
     global.spice_effects_blacklist = util.copy(config.default.spice_effects_blacklist)
-    global.travel_worm_data = util.copy(config.default.travel_worm_data)
+    global.travel_worm_data = {}
     global.track_travel_worms = {}
     global.track_dune_miners = {}
     global.track_water_injectors = {}
@@ -223,7 +223,7 @@ end
 lib.on_configuration_changed = function()
     global.render_table = global.render_table or util.copy(config.default.render)
     global.spice_effects_blacklist = global.spice_effects_blacklist or util.copy(config.default.spice_effects_blacklist)
-    global.travel_worm_data = global.travel_worm_data or util.copy(config.default.travel_worm_data)
+    global.travel_worm_data = global.travel_worm_data or {}
     configuration_changed.aliens()
     configuration_changed.players()
     configuration_changed.forces()

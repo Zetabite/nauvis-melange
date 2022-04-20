@@ -60,6 +60,17 @@ spice_influence_changed_raise = function(player_index)
     end
 end
 
+has_spice_effects = function(entity)
+    if entity.stickers then
+        for _, sticker in pairs(entity.stickers) do
+            if sticker.name == 'nm-spice-applied-sticker' then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 apply_spice_to_vehicle = function(player)
     local vehicle = player.vehicle
     if vehicle and vehicle.valid then
@@ -263,9 +274,8 @@ try_to_remove_spice_effects = function(player_index, ignore)
             end
         end
         if not has_spice_influence(player_index) then
-            local render_table = global.render_table
-            if render_table.spice_overlay[player_index] then
-                render_table.spice_overlay[player_index] = nil
+            if global.render_table.spice_overlay[player_index] then
+                table.remove(global.render_table.spice_overlay, player_index)
             end
             spice_influence_changed_raise(player_index)
         end
@@ -300,24 +310,13 @@ end
 
 player_removed = function(event)
     local player_index = event.player_index
-    global.players[player_index] = nil
-    global.render_table.spice_overlay[player_index] = nil
+    table.remove(global.players, player_index)
+    table.remove(global.render_table.spice_overlay, player_index)
 end
 
 player_left = function(event)
     local player_index = event.player_index
-    global.render_table.spice_overlay[player_index] = nil
-end
-
-has_spice_effects = function(entity)
-    if entity.stickers then
-        for _, sticker in pairs(entity.stickers) do
-            if sticker.name == 'nm-spice-applied-sticker' then
-                return true
-            end
-        end
-    end
-    return false
+    table.remove(global.render_table.spice_overlay, player_index)
 end
 
 render_spice_overlay_refresh = function()

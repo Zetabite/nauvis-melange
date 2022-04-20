@@ -256,7 +256,8 @@ data:extend({
         localised_description = {'item-description.nm-thumper-creative'},
         category = 'crafting',
         energy_required = 4,
-        enabled = true,
+        enabled = false,
+        hidden = true,
         ingredients = {
             { 'iron-stick', 1 },
         },

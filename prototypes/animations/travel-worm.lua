@@ -1,16 +1,16 @@
 local util = require('util')
+local config = require('scripts.config')
 require('prototypes.entity.travel-worm-attributes')
 
-function heavy_dust_animation()
+function heavy_dust_animation(kind)
     local dust = {
         type = 'animation',
-        name = 'nm-heavy-travel-worm-dust',
-        filename = '__nauvis-melange__/graphics/entity/travel-worm/dust.png',
+        name = 'nm-heavy-travel-worm-dust-'..kind,
+        filename = '__nauvis-melange__/graphics/entity/travel-worm/dust-'..kind..'.png',
         line_length = 8,
         width = 253,
         height = 210,
         frame_count = 60,
-        axially_symmetrical = false,
         direction_count = 1,
         shift = {-0.265625, -0.09375},
     }
@@ -1073,5 +1073,10 @@ data:extend({
     worm_change_pos_animation('big', 'emerge', 'forward'),
     worm_change_pos_animation('behemoth', 'submerge', 'backward'),
     worm_change_pos_animation('behemoth', 'emerge', 'forward'),
-    heavy_dust_animation(),
+    heavy_dust_animation('full-top'),
+    heavy_dust_animation('fade-in-top'),
+    heavy_dust_animation('fade-out-top'),
+    heavy_dust_animation('full-bottom'),
+    heavy_dust_animation('fade-in-bottom'),
+    heavy_dust_animation('fade-out-bottom'),
 })

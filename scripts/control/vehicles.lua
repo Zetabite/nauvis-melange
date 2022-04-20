@@ -1,16 +1,21 @@
 local config = require('scripts.config')
---local misc = require('__flib__.misc')
+local misc = require('__flib__.misc')
 local util = require('util')
-
+-- correct animation
 local travel_worm_tier = config.travel_worm_tier
-local travel_worm_dust_scaling = config.travel_worm_dust_scaling
 
-local frame_count = 60
-local preparing_livetime = 60 * 2
-local dust_livetime = preparing_livetime + 10
-local offset_time = - 60 * 0.5
-local main_animation_speed = frame_count / preparing_livetime
-local dust_animation_speed = 0.125
+local main_frame_count = 60
+local preparing_livetime = config.travel_worm_digging_time
+local main_animation_speed = main_frame_count / preparing_livetime
+local main_frame_count_scaled = main_frame_count / main_animation_speed
+
+local dust_frame_count = 60
+local dust_fade_in = config.travel_worm_dust.fade_in
+local dust_fade_out = config.travel_worm_dust.fade_out
+local dust_full = config.travel_worm_dust.full
+local dust_animation_speed = 1
+local dust_frame_count_scaled = dust_frame_count / dust_animation_speed
+local dust_offset = - 1
 
 built_entity = function(event)
     local entity = event.created_entity or event.destination
@@ -25,6 +30,7 @@ built_entity = function(event)
         if string.match(entity.name, 'nm%-travel%-worm%-') then
             local registration_number = script.register_on_entity_destroyed(entity)
             global.track_travel_worms[registration_number] = entity
+            global.travel_worm_data[registration_number] = util.copy(config.default.travel_worm_data)
             global.forces[creator_force.index]['travel_worms'][registration_number] = entity
         end
     end
@@ -36,14 +42,17 @@ destroyed_entity = function(event)
 
     if unit_number then
         if global.track_dune_miners[unit_number] then
-            global.track_dune_miners[unit_number] = nil
+            table.remove(global.track_dune_miners, unit_number)
         end
     else
         if global.track_travel_worms[registration_number] then
             local entity = global.track_travel_worms[registration_number]
-            global.forces[entity.force.index]['travel_worms'][registration_number] = nil
-            global.track_travel_worms[registration_number] = nil
-            global.travel_worm_data[registration_number] = nil
+            table.remove(global.forces[entity.force.index]['travel_worms'], registration_number)
+            table.remove(global.track_travel_worms, registration_number)
+            table.remove(global.travel_worm_data, registration_number)
+            if global.render_table.travel_worms[registration_number] then
+                table.remove(global.render_table.travel_worms, registration_number)
+            end
         end
     end
 end
@@ -66,92 +75,188 @@ call_travel_worm = function(registration_number)
     local player = entry.player
     local surface = worm.surface
     local stage = entry.stage
-    local dust_scale = entry.dust_scale
     local tier = entry.tier
-    local render_layer = 'higher-object-under'
-    local tint = {a = 0.5}
+    local dest_pos = entry.dest_pos
     local source_pos = entry.source_pos
+    local scale = entry.scale
 
-    if worm and worm.valid and player and surface.name == player.surface.name then
-        if stage == 'submerge' then
+    if worm and worm.valid and surface.name == player.surface.name then
+        if stage == '0' then
+            -- If player exists, we will continue, else we break up here
+            if player then
+                rendering.draw_animation({
+                    animation = 'nm-heavy-travel-worm-dust-fade-in-bottom',
+                    animation_speed = dust_animation_speed,
+                    animation_offset = - ((game.tick % dust_frame_count_scaled) * dust_animation_speed),
+                    time_to_live = dust_fade_in,
+                    x_scale = scale,
+                    y_scale = scale,
+                    surface = surface,
+                    target = source_pos,
+                    render_layer = 130,
+                })
+                rendering.draw_animation({
+                    animation = 'nm-heavy-travel-worm-dust-fade-in-top',
+                    animation_speed = dust_animation_speed,
+                    animation_offset = - ((game.tick % dust_frame_count_scaled) * dust_animation_speed),
+                    time_to_live = dust_fade_in,
+                    x_scale = scale,
+                    y_scale = scale,
+                    surface = surface,
+                    target = source_pos,
+                    render_layer = 132,
+                })
+
+                entry.deadline = game.tick + dust_fade_in + dust_offset
+                entry.stage = '1'
+            else
+                entry.stage = 'final'
+                entry.deadline = game.tick
+            end
+        elseif stage == '1' then
             rendering.draw_animation({
-                animation = 'nm-heavy-travel-worm-dust',
-                render_layer = render_layer,
+                animation = 'nm-heavy-travel-worm-dust-full-bottom',
                 animation_speed = dust_animation_speed,
-                time_to_live = dust_livetime,
+                time_to_live = dust_full,
+                x_scale = scale,
+                y_scale = scale,
                 surface = surface,
                 target = source_pos,
-                x_scale = dust_scale,
-                y_scale = dust_scale,
+                render_layer = 130,
+            })
+            rendering.draw_animation({
+                animation = 'nm-heavy-travel-worm-dust-full-top',
+                animation_speed = dust_animation_speed,
+                time_to_live = dust_full,
+                x_scale = scale,
+                y_scale = scale,
+                surface = surface,
+                target = source_pos,
+                render_layer = 132,
             })
             rendering.draw_animation({
                 animation = 'nm-submerge-animation-travel-worm-'..tier,
-                render_layer = render_layer,
                 animation_speed = main_animation_speed,
-                --animation_offset = frame_count - (game.tick % frame_count),
+                animation_offset = - ((game.tick % main_frame_count_scaled) * main_animation_speed),
                 time_to_live = preparing_livetime,
                 surface = surface,
-                target = source_pos
+                target = source_pos,
+                render_layer = 131,
+            })
+
+            entry.deadline = game.tick + dust_full - dust_fade_in
+            entry.stage = '2'
+        elseif stage == '2' then
+            rendering.draw_animation({
+                animation = 'nm-heavy-travel-worm-dust-fade-in-bottom',
+                animation_speed = dust_animation_speed,
+                animation_offset = - ((game.tick % dust_frame_count_scaled) * dust_animation_speed),
+                time_to_live = dust_fade_in,
+                x_scale = scale,
+                y_scale = scale,
+                surface = surface,
+                target = dest_pos,
+                render_layer = 130,
             })
             rendering.draw_animation({
-                animation = 'nm-heavy-travel-worm-dust',
-                render_layer = render_layer,
+                animation = 'nm-heavy-travel-worm-dust-fade-in-top',
                 animation_speed = dust_animation_speed,
-                time_to_live = dust_livetime,
+                animation_offset = - ((game.tick % dust_frame_count_scaled) * dust_animation_speed),
+                time_to_live = dust_fade_in,
+                x_scale = scale,
+                y_scale = scale,
                 surface = surface,
-                target = source_pos,
-                tint = tint,
-                x_scale = dust_scale,
-                y_scale = dust_scale,
+                target = dest_pos,
+                render_layer = 132,
             })
-            entry.deadline = preparing_livetime + game.tick + offset_time
-            entry.stage = 'emerge'
-        elseif stage == 'emerge' then
-            local dest_pos = entry.dest_pos
-            local search_box = {
-                left_top = {dest_pos.x - 5, dest_pos.y - 5},
-                right_bottom = {dest_pos.x + 5, dest_pos.y + 5}
-            }
-            dest_pos = surface.find_non_colliding_position_in_box(worm.name, search_box, 0.5)
+
+            entry.deadline = game.tick + dust_fade_in + dust_offset
+            entry.stage = '3'
+        elseif stage == '3' then
             worm.teleport(dest_pos, surface)
 
             rendering.draw_animation({
-                animation = 'nm-heavy-travel-worm-dust',
-                render_layer = render_layer,
+                animation = 'nm-heavy-travel-worm-dust-fade-out-bottom',
                 animation_speed = dust_animation_speed,
-                time_to_live = dust_livetime,
+                animation_offset = - ((game.tick % dust_frame_count_scaled) * dust_animation_speed),
+                time_to_live = dust_fade_out,
+                x_scale = scale,
+                y_scale = scale,
+                surface = surface,
+                target = source_pos,
+                render_layer = 130,
+            })
+            rendering.draw_animation({
+                animation = 'nm-heavy-travel-worm-dust-fade-out-top',
+                animation_speed = dust_animation_speed,
+                animation_offset = - ((game.tick % dust_frame_count_scaled) * dust_animation_speed),
+                time_to_live = dust_fade_out,
+                x_scale = scale,
+                y_scale = scale,
+                surface = surface,
+                target = source_pos,
+                render_layer = 132,
+            })
+            rendering.draw_animation({
+                animation = 'nm-heavy-travel-worm-dust-full-bottom',
+                animation_speed = dust_animation_speed,
+                time_to_live = dust_full,
+                x_scale = scale,
+                y_scale = scale,
                 surface = surface,
                 target = dest_pos,
-                x_scale = dust_scale,
-                y_scale = dust_scale,
+                render_layer = 130,
+            })
+            rendering.draw_animation({
+                animation = 'nm-heavy-travel-worm-dust-full-top',
+                animation_speed = dust_animation_speed,
+                time_to_live = dust_full,
+                x_scale = scale,
+                y_scale = scale,
+                surface = surface,
+                target = dest_pos,
+                render_layer = 132,
             })
             rendering.draw_animation({
                 animation = 'nm-emerge-animation-travel-worm-'..tier,
-                render_layer = render_layer,
                 animation_speed = main_animation_speed,
-                --animation_offset = frame_count - (game.tick % frame_count),
+                animation_offset = - ((game.tick % main_frame_count_scaled) * main_animation_speed),
                 time_to_live = preparing_livetime,
                 surface = surface,
-                target = dest_pos
-            })
-            rendering.draw_animation({
-                animation = 'nm-heavy-travel-worm-dust',
-                render_layer = render_layer,
-                animation_speed = dust_animation_speed,
-                time_to_live = dust_livetime,
-                surface = surface,
                 target = dest_pos,
-                tint = tint,
-                x_scale = dust_scale,
-                y_scale = dust_scale,
+                render_layer = 131,
             })
-            entry.deadline = preparing_livetime + game.tick
+
+            entry.deadline = game.tick + dust_full + dust_offset
             entry.stage = 'final'
         elseif stage == 'final' then
-            entry = nil
+            rendering.draw_animation({
+                animation = 'nm-heavy-travel-worm-dust-fade-out-bottom',
+                animation_speed = dust_animation_speed,
+                animation_offset = - ((game.tick % dust_frame_count_scaled) * dust_animation_speed),
+                time_to_live = dust_fade_out,
+                x_scale = scale,
+                y_scale = scale,
+                surface = surface,
+                target = dest_pos,
+                render_layer = 130,
+            })
+            rendering.draw_animation({
+                animation = 'nm-heavy-travel-worm-dust-fade-out-top',
+                animation_speed = dust_animation_speed,
+                animation_offset = - ((game.tick % dust_frame_count_scaled) * dust_animation_speed),
+                time_to_live = dust_fade_out,
+                x_scale = scale,
+                y_scale = scale,
+                surface = surface,
+                target = dest_pos,
+                render_layer = 132,
+            })
+
+            entry = util.copy(config.default.travel_worm_data)
         end
     else
-        entry = nil
+        entry = worm.valid
     end
     global.travel_worm_data[registration_number] = entry
 end
@@ -163,45 +268,45 @@ used_capsule = function(event)
     local force_index = player.force.index
 
     if event.item.name == 'nm-thumper' or event.item.name == 'nm-thumper-creative'then
-        local target = false
+        local worm = false
         local prev_distance = false
         local registration_number = false
-        local x = 0
-        local y = 0
         local distance = 0
 
         for reg_number, travel_worm in pairs(global.forces[force_index]['travel_worms']) do
-            if travel_worm and travel_worm.valid and not global.travel_worm_data[reg_number] then
+            if travel_worm and travel_worm.valid and global.travel_worm_data[reg_number].lock == 'free' then
                 if not travel_worm.get_driver() and not travel_worm.get_passenger() then
                     if player.surface.index == travel_worm.surface.index then
-                        x = pos.x + travel_worm.position.x
-                        x = x * x
-                        y = pos.y + travel_worm.position.y
-                        y = y * y
-
-                        distance = x + y
+                        distance = misc.get_distance(pos, travel_worm.position)
                         if not prev_distance or prev_distance > distance then
                             if registration_number then
-                                global.travel_worm_data[registration_number] = false
+                                global.travel_worm_data[registration_number].lock = 'free'
                             end
-                            global.travel_worm_data[reg_number] = true
+                            global.travel_worm_data[reg_number].lock = 'locked'
                             prev_distance = distance
-                            target = travel_worm
+                            worm = travel_worm
                             registration_number = reg_number
                         end
                     end
                 end
             end
         end
-        if target and target.valid then
+        if worm and worm.valid then
+            local dest_pos = player.position
+            local search_box = {
+                left_top = {dest_pos.x - 5, dest_pos.y - 5},
+                right_bottom = {dest_pos.x + 5, dest_pos.y + 5}
+            }
+            dest_pos = worm.surface.find_non_colliding_position_in_box(worm.name, search_box, 0.5)
             local entry = {
-                worm = target,
+                worm = worm,
                 player = player,
-                stage = 'submerge',
-                source_pos = target.position,
-                dest_pos = player.position,
-                tier = travel_worm_tier[target.name],
-                dust_scale = travel_worm_dust_scaling[target.name]
+                stage = '0',
+                source_pos = worm.position,
+                dest_pos = dest_pos,
+                scale = config.travel_worm_dust.scaling[travel_worm_tier[worm.name]],
+                tier = travel_worm_tier[worm.name],
+                deadline = false
             }
             global.travel_worm_data[registration_number] = entry
             call_travel_worm(registration_number)
@@ -211,7 +316,7 @@ end
 
 check_travel_worm_animations = function()
     for registration_number, entry in pairs(global.travel_worm_data) do
-        if game.tick >= entry.deadline then
+        if entry.deadline and entry and game.tick >= entry.deadline then
             call_travel_worm(registration_number)
         end
     end
@@ -231,6 +336,8 @@ lib.events = {
 lib.on_nth_tick = {
     [config.HIGH_FIDELITY_CHECK_TICK] = function()
         -- check_dunes()
+    end,
+    [config.HIGHEST_FIDELITY_CHECK_TICK] = function()
         check_travel_worm_animations()
     end
 }

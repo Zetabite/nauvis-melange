@@ -22,9 +22,9 @@ built_entity = function(event)
 end
 
 destroyed_entity = function(event)
-    local entry = global.track_water_injectors[event.registration_number]
-    if entry then
-        entry = nil
+    local registration_number = event.registration_number
+    if global.track_water_injectors[registration_number] then
+        table.remove(global.track_water_injectors, registration_number)
     end
 end
 
